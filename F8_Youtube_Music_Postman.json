@@ -1,0 +1,699 @@
+{
+  "info": {
+    "_postman_id": "834c7b80-1a76-47e1-8f53-b0a3407e7811",
+    "name": "F8 Youtube Music API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"dungvq\",\n  \"email\": \"dung.vuquoc0102@gmail.com\",\n  \"password\": \"12345678\",\n  \"confirmPassword\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dung.vuquoc0102@gmail.com\",\n  \"password\": \"123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh-token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"12345678\",\n  \"password\": \"123456789\",\n  \"confirmPassword\": \"123456789\"\n}\n"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update current user",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"dungvq update\",\n  \"email\": \"dung.vuquoc0102@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create play history",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"songId\": \"691cc6ad338d2c9362566907\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/events/play",
+              "host": ["{{base_url}}"],
+              "path": ["api", "events", "play"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "Get all categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get category detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories/nh-c-ballad?subLimit=10&playlistLimit=6&subSort=name&playlistSort=popularity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "nh-c-ballad"],
+              "query": [
+                {
+                  "key": "subLimit",
+                  "value": "10",
+                  "description": "số lượng chuyên mục con tối đa trả về. Default: 10."
+                },
+                {
+                  "key": "playlistLimit",
+                  "value": "6",
+                  "description": "số playlist tối đa trả về cho mỗi chuyên mục con. Default: 6."
+                },
+                {
+                  "key": "subSort",
+                  "value": "name",
+                  "description": "cách sắp xếp chuyên mục con. Hỗ trợ: name (mặc định) hoặc popularity."
+                },
+                {
+                  "key": "playlistSort",
+                  "value": "popularity"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Line",
+      "item": [
+        {
+          "name": "Get line detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines/bu-n-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines", "bu-n-1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all lines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Song",
+      "item": [
+        {
+          "name": "Get all tracks by line",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines/bu-n-1/songs?limit=20&sort=-popularity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines", "bu-n-1", "songs"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "số lượng tối đa trả về. Mặc định 20."
+                },
+                {
+                  "key": "sort",
+                  "value": "-popularity",
+                  "description": "trường để sắp xếp. Mặc định -popularity."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get song detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/songs/details/691cc6ad338d2c9362566907",
+              "host": ["{{base_url}}"],
+              "path": ["api", "songs", "details", "691cc6ad338d2c9362566907"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Music video",
+      "item": [
+        {
+          "name": "Get all videos by line",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines/bu-n-1/videos?limit=20&sort=-popularity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines", "bu-n-1", "videos"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "số lượng tối đa trả về. Mặc định 20."
+                },
+                {
+                  "key": "sort",
+                  "value": "-popularity",
+                  "description": "trường để sắp xếp. Mặc định -popularity."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get music video detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/videos/details/691cb50edd97648f59757b4d",
+              "host": ["{{base_url}}"],
+              "path": ["api", "videos", "details", "691cb50edd97648f59757b4d"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Playlist",
+      "item": [
+        {
+          "name": "Get all playlists by line",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines/bu-n-1/playlists?limit=20&sort=-popularity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines", "bu-n-1", "playlists"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "số lượng tối đa trả về. Mặc định 20."
+                },
+                {
+                  "key": "sort",
+                  "value": "-popularity",
+                  "description": "trường để sắp xếp. Mặc định -popularity."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get playlist detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/playlists/details/nh-c-lofi-m-i-ph-t-h-nh-tuy-n-ch-n-3-691cc2",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "playlists",
+                "details",
+                "nh-c-lofi-m-i-ph-t-h-nh-tuy-n-ch-n-3-691cc2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Album",
+      "item": [
+        {
+          "name": "Get all albums by line",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/lines/bu-n-1/albums?limit=20&sort=-popularity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "lines", "bu-n-1", "albums"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "số lượng tối đa trả về. Mặc định 20."
+                },
+                {
+                  "key": "sort",
+                  "value": "-popularity",
+                  "description": "trường để sắp xếp. Mặc định -popularity."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get album detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/albums/details/nhc-acoustic-album-16-15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "albums", "details", "nhc-acoustic-album-16-15"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Explore",
+      "item": [
+        {
+          "name": "Get all albums",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/explore/albums",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "albums"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all videos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/explore/videos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "videos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all categories and lines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/explore/meta",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "meta"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all new releases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/explore/new-releases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "new-releases"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Chart",
+          "item": [
+            {
+              "name": "Get all videos by chart",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/charts/videos",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "charts", "videos"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get all artists by chart",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/charts/top-artists",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "charts", "top-artists"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get all countries by chart",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/charts/countries",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "charts", "countries"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Home",
+      "item": [
+        {
+          "name": "Get all moods",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/moods",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moods"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get mood detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/moods/energize",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moods", "energize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get quick picks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/quick-picks",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quick-picks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all albums for you",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/home/albums-for-you",
+              "host": ["{{base_url}}"],
+              "path": ["api", "home", "albums-for-you"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all today hits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/home/todays-hits",
+              "host": ["{{base_url}}"],
+              "path": ["api", "home", "todays-hits"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all playlists by country",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/playlists/by-country",
+              "host": ["{{base_url}}"],
+              "path": ["api", "playlists", "by-country"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get personalized",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/home/personalized",
+              "host": ["{{base_url}}"],
+              "path": ["api", "home", "personalized"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search suggestions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search/suggestions?q=acoustic",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search", "suggestions"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "acoustic"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/search?q=acoustic",
+              "host": ["{{base_url}}"],
+              "path": ["api", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "acoustic"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

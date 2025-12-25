@@ -32,3 +32,4 @@ dist-ssr
 Thumbs.db
 .vercel
 .env*.local
+docs/

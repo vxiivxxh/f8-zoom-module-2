@@ -14,10 +14,10 @@ export const MainLayout = (content, router) => {
             <div class="aurora-bg"></div>
             ${Sidebar()}
             
-            <div class="flex flex-col flex-1 pl-sidebar ml-4 transition-all">
+            <div class="flex flex-col flex-1 pl-sidebar ml-[10vw] transition-all relative z-10">
                 ${Header()}
                 
-                <main class="flex-1 overflow-y-auto mt-header pb-player p-8 scroll-smooth">
+                <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth">
                     ${content}
                 </main>
             </div>

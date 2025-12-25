@@ -6,20 +6,9 @@ export const Header = () => {
   const initial = user && user.name ? user.name.charAt(0).toUpperCase() : 'G';
 
   return `
-    <header class="fixed top-0 left-0 right-0 h-header bg-transparent z-header flex items-center justify-between px-4">
-      
-      <!-- Left: Hamburger & Logo -->
-      <div class="flex items-center gap-4">
-        <button id="sidebar-toggle" class="p-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-        </button>
-        <a href="${import.meta.env.BASE_URL}" class="flex items-center justify-center p-2 logo-container" data-navigo>
-           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
-        </a>
-      </div>
-
+    <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-8 mb-4">
       <!-- Center: Search Bar -->
-      <div class="flex items-center flex-1 max-w-xl ml-10">
+      <div class="flex items-center flex-1 max-w-xl">
         <div class="relative w-full">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-yt-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -27,7 +16,7 @@ export const Header = () => {
             <input 
                 type="text" 
                 placeholder="Tìm kiếm bài hát, album, nghệ sĩ..." 
-                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-stone-900 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-500"
+                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-white/10 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-400"
             >
         </div>
       </div>

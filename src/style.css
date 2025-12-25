@@ -83,13 +83,21 @@ body.sidebar-collapsed aside nav a svg {
     height: 24px;
 }
 
-/* Hide logo text/extra items if any in header of sidebar */
-/* Adjust logo container centering */
+/* Remove alignment override to keep position consistent */
 body.sidebar-collapsed aside>div:first-child {
-    padding-left: 0;
-    padding-right: 0;
-    padding-right: 0;
-    justify-content: center;
+    /* We want to keep original padding/alignment, so we remove the forced centering */
+        /* If we want to hide logo, we can do it here, but user asked to keep it. */
+        /* padding-left: 0; padding-right: 0; justify-content: center; */
+        /* Resetting/Removing these properties effectively. */
+        /* Since we can't easily 'delete' nicely with replace tool if lines vary, 
+           I will set them to inherit or unset, OR just delete the block content/comment it out. 
+           Best is to empty the block or set values that mimic expanded state if needed. 
+           Actually, standard replacement is better. */
+    }
+    
+    /* Better yet, just delete the rule or make it do nothing */
+    body.sidebar-collapsed aside>div:first-child {
+        /* No overrides */
 }
 /* Aurora Background Effect */
 .aurora-bg {

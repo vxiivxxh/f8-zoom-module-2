@@ -6,7 +6,18 @@
 
 export const Sidebar = () => {
   return `
-    <aside class="fixed top-header left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-sidebar border-r border-gray-800 transition-all duration-300">
+    <aside class="fixed top-0 left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-50 border-r border-gray-800 transition-all duration-300">
+      
+      <!-- Top: Hamburger & Logo -->
+      <div class="flex items-center gap-4 px-4 pl-6 mb-2 h-16 shrink-0">
+        <button id="sidebar-toggle" class="p-2 -ml-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <a href="${import.meta.env.BASE_URL}" class="flex items-center justify-center p-2 logo-container shrink-0" data-navigo>
+           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
+        </a>
+      </div>
+
       <nav class="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
         
         <!-- Primary Navigation -->

@@ -121,7 +121,18 @@
       </div>
     </div>
   `;t.innerHTML=r;const s=document.getElementById("register-form"),n=document.getElementById("error-message");s.addEventListener("submit",async i=>{i.preventDefault();const a=document.getElementById("name").value,c=document.getElementById("email").value,d=document.getElementById("password").value,h=document.getElementById("confirm-password").value;let u=!0,m="";if(rt(a)?fe(c)?pe(d)?d!==h&&(m="Mật khẩu không khớp.",u=!1):(m="Mật khẩu phải có ít nhất 6 ký tự.",u=!1):(m="Email không hợp lệ.",u=!1):(m="Tên phải có ít nhất 2 ký tự.",u=!1),!u){n.textContent=m,n.classList.remove("hidden");return}n.classList.add("hidden"),n.textContent="";const v=s.querySelector('button[type="submit"]'),b=v.textContent;v.disabled=!0,v.textContent="Đang đăng ký & đăng nhập...";const x=await E.register(a,c,d,h);x.success?e.navigate("/"):(n.textContent=x.error||"Đăng ký thất bại.",n.classList.remove("hidden"),v.disabled=!1,v.textContent=b)})},ot="modulepreload",it=function(e){return"/f8-zoom-module-2/"+e},ne={},ge=function(t,r,s){let n=Promise.resolve();if(r&&r.length>0){let h=function(u){return Promise.all(u.map(m=>Promise.resolve(m).then(v=>({status:"fulfilled",value:v}),v=>({status:"rejected",reason:v}))))};var a=h;document.getElementsByTagName("link");const c=document.querySelector("meta[property=csp-nonce]"),d=c?.nonce||c?.getAttribute("nonce");n=h(r.map(u=>{if(u=it(u),u in ne)return;ne[u]=!0;const m=u.endsWith(".css"),v=m?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${u}"]${v}`))return;const b=document.createElement("link");if(b.rel=m?"stylesheet":ot,m||(b.as="script"),b.crossOrigin="",b.href=u,d&&b.setAttribute("nonce",d),document.head.appendChild(b),m)return new Promise((x,w)=>{b.addEventListener("load",x),b.addEventListener("error",()=>w(new Error(`Unable to preload CSS for ${u}`)))})}))}function i(c){const d=new Event("vite:preloadError",{cancelable:!0});if(d.payload=c,window.dispatchEvent(d),!d.defaultPrevented)throw c}return n.then(c=>{for(const d of c||[])d.status==="rejected"&&i(d.reason);return t().catch(i)})},j=e=>typeof e!="string"?e:e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"),at=()=>`
-    <aside class="fixed top-header left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-sidebar border-r border-gray-800 transition-all duration-300">
+    <aside class="fixed top-0 left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-50 border-r border-gray-800 transition-all duration-300">
+      
+      <!-- Top: Hamburger & Logo -->
+      <div class="flex items-center gap-4 px-4 pl-6 mb-2 h-16 shrink-0">
+        <button id="sidebar-toggle" class="p-2 -ml-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <a href="/f8-zoom-module-2/" class="flex items-center justify-center p-2 logo-container shrink-0" data-navigo>
+           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
+        </a>
+      </div>
+
       <nav class="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
         
         <!-- Primary Navigation -->
@@ -184,20 +195,9 @@
       </nav>
     </aside>
   `;class lt{constructor(){this.state={isSidebarCollapsed:localStorage.getItem("sidebarCollapsed")==="true"},this.listeners=[],this.init()}init(){this.applyState()}subscribe(t){return this.listeners.push(t),()=>{this.listeners=this.listeners.filter(r=>r!==t)}}notify(){this.listeners.forEach(t=>t(this.state))}toggleSidebar(){this.state.isSidebarCollapsed=!this.state.isSidebarCollapsed,localStorage.setItem("sidebarCollapsed",this.state.isSidebarCollapsed),this.applyState(),this.notify()}applyState(){this.state.isSidebarCollapsed?document.body.classList.add("sidebar-collapsed"):document.body.classList.remove("sidebar-collapsed")}get isSidebarCollapsed(){return this.state.isSidebarCollapsed}}const ct=new lt,oe=()=>{const e=E.user,t=e&&e.name?e.name.charAt(0).toUpperCase():"G";return`
-    <header class="fixed top-0 left-0 right-0 h-header bg-transparent z-header flex items-center justify-between px-4">
-      
-      <!-- Left: Hamburger & Logo -->
-      <div class="flex items-center gap-4">
-        <button id="sidebar-toggle" class="p-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-        </button>
-        <a href="/f8-zoom-module-2/" class="flex items-center justify-center p-2 logo-container" data-navigo>
-           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
-        </a>
-      </div>
-
+    <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-8 mb-4">
       <!-- Center: Search Bar -->
-      <div class="flex items-center flex-1 max-w-xl ml-10">
+      <div class="flex items-center flex-1 max-w-xl">
         <div class="relative w-full">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-yt-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -205,7 +205,7 @@
             <input 
                 type="text" 
                 placeholder="Tìm kiếm bài hát, album, nghệ sĩ..." 
-                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-stone-900 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-500"
+                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-white/10 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-400"
             >
         </div>
       </div>
@@ -291,10 +291,10 @@
             <div class="aurora-bg"></div>
             ${at()}
             
-            <div class="flex flex-col flex-1 pl-sidebar ml-4 transition-all">
+            <div class="flex flex-col flex-1 pl-sidebar ml-[10vw] transition-all relative z-10">
                 ${oe()}
                 
-                <main class="flex-1 overflow-y-auto mt-header pb-player p-8 scroll-smooth">
+                <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth">
                     ${e}
                 </main>
             </div>

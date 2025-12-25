@@ -1,4 +1,5 @@
 import { authStore } from '../store/authStore.js';
+import { validateEmail, validatePassword } from '../utils/validators.js';
 
 export const renderLogin = (router) => {
   const app = document.getElementById('app');
@@ -67,6 +68,19 @@ export const renderLogin = (router) => {
     // Clear previous errors
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
+    
+    // Validation
+    if (!validateEmail(email)) {
+        errorDiv.textContent = 'Email không hợp lệ. Vui lòng kiểm tra lại.';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    if (!validatePassword(password)) {
+        errorDiv.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
     
     // Disable button to prevent double submit
     const submitBtn = form.querySelector('button[type="submit"]');

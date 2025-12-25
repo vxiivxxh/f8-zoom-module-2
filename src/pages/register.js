@@ -1,4 +1,5 @@
 import { authStore } from '../store/authStore.js';
+import { validateName, validateEmail, validatePassword } from '../utils/validators.js';
 
 export const renderRegister = (router) => {
   const app = document.getElementById('app');
@@ -91,8 +92,25 @@ export const renderRegister = (router) => {
     const confirmPassword = document.getElementById('confirm-password').value;
     
     // Basic validation
-    if (password !== confirmPassword) {
-      errorDiv.textContent = 'Mật khẩu không khớp';
+    let isValid = true;
+    let errorMessage = '';
+
+    if (!validateName(name)) {
+        errorMessage = 'Tên phải có ít nhất 2 ký tự.';
+        isValid = false;
+    } else if (!validateEmail(email)) {
+        errorMessage = 'Email không hợp lệ.';
+        isValid = false;
+    } else if (!validatePassword(password)) {
+        errorMessage = 'Mật khẩu phải có ít nhất 6 ký tự.';
+        isValid = false;
+    } else if (password !== confirmPassword) {
+        errorMessage = 'Mật khẩu không khớp.';
+        isValid = false;
+    }
+
+    if (!isValid) {
+      errorDiv.textContent = errorMessage;
       errorDiv.classList.remove('hidden');
       return;
     }

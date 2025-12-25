@@ -1,80 +1,61 @@
-import "./style.css";
-import { initRouter } from "./router";
-import { store } from "./state/store";
-import { checkAuth } from "./api/client";
-import Sidebar from "./components/sidebar";
-import Header, { headerScript } from "./components/header";
-import PlayerBar from "./components/PlayerBar";
+import './style.css';
+import Navigo from 'navigo';
+import { authStore } from './store/authStore';
+import { renderLogin } from './pages/login';
+import { renderRegister } from './pages/register';
+import { renderHome } from './pages/home';
+import { renderExplore } from './pages/explore';
 
-document.querySelector("#app").innerHTML = `
-  <div class="flex h-screen bg-black text-white font-roboto overflow-hidden">
-    <!-- Sidebar: Thanh điều hướng bên trái -->
-    ${Sidebar()}
+const router = new Navigo('/');
 
-    <!-- Main Section: Khu vực nội dung chính -->
-    <main class="flex-1 flex flex-col relative min-w-0 bg-[#030303]">
-        <!-- Top Bar: Thanh tìm kiếm và User -->
-        ${Header()}
+// Route Definitions
+router
+  .on({
+    '/': () => {
+      renderHome(router);
+    },
+    '/explore': () => {
+        renderExplore(router);
+    },
+    '/login': () => {
+      if (authStore.isAuthenticated) {
+        router.navigate('/');
+      } else {
+        renderLogin(router);
+      }
+    },
+    '/register': () => {
+      if (authStore.isAuthenticated) {
+        router.navigate('/');
+      } else {
+        renderRegister(router);
+      }
+    }
+  });
 
-        <!-- Scrollable Content: Nơi các trang (Page) sẽ được render vào đây -->
-        <div id="main-content" class="flex-1 overflow-y-auto w-full custom-scrollbar pb-24">
-            <!-- Pages render here -->
-        </div>
-        
-        <!-- Player: Thanh phát nhạc cố định dưới cùng -->
-        ${PlayerBar()}
-    </main>
-  </div>
-`;
-initRouter();
+// Auth Guard / Hooks
+router.hooks({
+  before: async (done, params) => {
+    // Determine if the route is protected (for future)
+    // For now, we just ensure we have the latest user state
+    if (!authStore.isAuthenticated && localStorage.getItem('accessToken')) {
+      // Try to restore session
+      await authStore.init();
+    }
+    done();
+  }
+});
 
+// Initialize
+// Wait for initial auth check if needed, then resolve
 (async () => {
-    const user = await checkAuth();
-    if (user) {
-        store.setState({
-            auth: {
-                isAuthenticated: true,
-                user: user
-            }
-        });
-    }
+  // If we have a token, wait for init to complete to avoid flash of "Guest"
+  if (localStorage.getItem('accessToken')) {
+    // We can subscribe to wait for loading to finish, or just await init if we exposed it
+    // authStore.init() is called in constructor but async. 
+    // Let's rely on the store's state or a simple delay/check for this Phase.
+    // Ideally authStore.init() should be awaitable or we await a promise.
+    // For simplicity in this vanilla app, we'll let the hook handle it or just render.
+  }
+  router.resolve();
 })();
-
-const setupSearch = () => {
-    const searchInput = document.getElementById("search-input");
-    if(searchInput) {
-        searchInput.addEventListener("keydown", (e) => {
-            if(e.key === "Enter") {
-                const query = e.target.value.trim();
-                if(query) {
-                    console.log("Đang tìm kiếm:", query);
-                }
-            }
-        });
-    }
-};
-
-const setupSidebar = () => {
-    const toggleBtn = document.getElementById("sidebar-toggle");
-    const sidebar = document.querySelector("aside");
-    const sidebarTexts = document.querySelectorAll(".sidebar-text");
-    
-    if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener("click", () => {
-            if (sidebar.classList.contains("w-60")) {
-                sidebar.classList.remove("w-60");
-                sidebar.classList.add("w-20");
-                sidebar.classList.add("items-center"); 
-                sidebarTexts.forEach(text => text.classList.add("hidden"));
-            } else {
-                sidebar.classList.remove("w-20");
-                sidebar.classList.remove("items-center");
-                sidebar.classList.add("w-60");
-                sidebarTexts.forEach(text => text.classList.remove("hidden"));
-            }
-        });
-    }
-};
-setupSearch();
-setupSidebar();
-headerScript();

@@ -12,16 +12,16 @@ export const renderHome = async (router) => {
 
   try {
     // Parallel data fetching
-    const [albumsRes, hitsRes] = await Promise.all([
+    const [albumsRes, hitsRes, quickPicksRes] = await Promise.all([
        apiClient.get('/home/albums-for-you'),
-       apiClient.get('/home/todays-hits')
+       apiClient.get('/home/todays-hits'),
+       apiClient.get('/quick-picks')
     ]);
 
-    // Parse data: response.data.data (standard) or response.data (if client helper didn't unwrap enough)
-    // The previous implementation assumed response.data directly which might be incorrect based on API tests.
-    // Let's robustly check.
+    // Parse data safely
     const albums = albumsRes.data?.data || albumsRes.data || [];
     const hits = hitsRes.data?.data || hitsRes.data || [];
+    const quickPicks = quickPicksRes.data?.data || quickPicksRes.data || [];
 
     // User personalization
     const user = authStore.user;
@@ -34,6 +34,23 @@ export const renderHome = async (router) => {
            <h1 class="text-3xl font-bold mb-2">${greeting}</h1>
            ${!user ? '<p class="text-yt-text-secondary">Đăng nhập để xem lịch sử nghe nhạc và đề xuất riêng cho bạn.</p>' : ''}
         </div>
+
+        <!-- Section 0: Quick Picks (Mock or Real) -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+             <div>
+                <span class="text-yt-text-secondary uppercase tracking-widest text-xs font-bold">Bắt đầu nhanh</span>
+                <h2 class="text-2xl font-bold">Tuyển tập nhanh</h2>
+             </div>
+             <!-- <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Phát tất cả</button> -->
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+             ${Array.isArray(quickPicks) && quickPicks.length > 0 
+                ? quickPicks.slice(0, 5).map(item => renderCard(item)).join('')
+                : '<p class="col-span-full text-yt-text-secondary">Chưa có tuyển tập nhanh nào.</p>'
+             }
+          </div>
+        </section>
 
         <!-- Section 1: Albums for you -->
         <section>

@@ -345,7 +345,7 @@
            <h3 class="text-xl font-bold">Lỗi tải dữ liệu</h3>
            <p>${t.message}</p>
        </div>
-    `,e)}},at=e=>{const t=e.title||e.name||"No Title",r=Array.isArray(e.artists)?e.artists.map(n=>typeof n=="string"?n:n.name).join(", "):"",s=e.thumbnails&&e.thumbnails[0]||e.thumbnail||e.image||"https://via.placeholder.com/300";return`
+    `,e)}},at=e=>{const t=e.title||e.name||"No Title",r=Array.isArray(e.artists)?e.artists.map(n=>typeof n=="string"?n:n.name).join(", "):"",s=e.thumbnails&&e.thumbnails[0]||e.thumbnail||e.thumb||e.image||"https://via.placeholder.com/300";return`
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(e).replace(/'/g,"&#39;")}'>
          <div class="relative aspect-square mb-3 rounded overflow-hidden bg-gray-800">
             <img src="${s}" alt="${t}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">

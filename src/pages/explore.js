@@ -1,4 +1,5 @@
 import { apiClient } from '../utils/api';
+import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 
 export const renderExplore = async (router) => {
@@ -74,10 +75,14 @@ export const renderExplore = async (router) => {
 
 // Reused simple card (Should be a shared component in real app)
 const renderCard = (item) => {
-    const title = item.title || item.name || 'No Title';
-    const subtitle = Array.isArray(item.artists) 
+    const rawTitle = item.title || item.name || 'No Title';
+    const title = escapeHTML(rawTitle);
+
+    const rawSubtitle = Array.isArray(item.artists) 
         ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
         : '';
+    const subtitle = escapeHTML(rawSubtitle);
+
     const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.thumb || item.image || 'https://via.placeholder.com/300';
     
     return `
@@ -90,8 +95,8 @@ const renderCard = (item) => {
                </button>
             </div>
          </div>
-         <h3 class="font-medium text-white truncate hover:underline">${title}</h3>
-         <p class="text-sm text-yt-text-secondary truncate">${subtitle}</p>
+         <h3 class="font-medium text-white truncate hover:underline" title="${title}">${title}</h3>
+         <p class="text-sm text-yt-text-secondary truncate" title="${subtitle}">${subtitle}</p>
       </div>
     `;
 };

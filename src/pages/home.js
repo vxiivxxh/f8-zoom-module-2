@@ -1,4 +1,5 @@
 import { apiClient } from '../utils/api';
+import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 import { authStore } from '../store/authStore';
 
@@ -110,18 +111,22 @@ export const renderHome = async (router) => {
 // Helper: Card Component
 const renderCard = (item) => {
     // Handle different API structures. Assuming item has title, description, thumbnail
-    const title = item.title || item.name || 'Không có tiêu đề';
+    const rawTitle = item.title || item.name || 'Không có tiêu đề';
+    const title = escapeHTML(rawTitle);
+
     // API returns artists as string array, or object array depending on endpoint. Handle both.
-    const subtitle = Array.isArray(item.artists) 
+    const rawSubtitle = Array.isArray(item.artists) 
         ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
         : (item.description || '');
+    const subtitle = escapeHTML(rawSubtitle);
         
     // API returns thumbnails as array
     const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.image || 'https://via.placeholder.com/300';
     
     // Encode item data for passing to onclick (Not elegant but works for Vanilla string template)
-    // Better: Attach event listeners after render.
-    // For now, let's stick to global or event delegation.
+    // We also need to be careful with JSON.stringify inside HTML attribute but single quotes helps.
+    // Ideally we should assign data via property, but this pattern is used throughout the plan.
+    // escaping quotes in the JSON string is crucial for the data-song attribute.
     
     return `
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

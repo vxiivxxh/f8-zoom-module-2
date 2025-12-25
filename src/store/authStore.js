@@ -49,8 +49,14 @@ class AuthStore {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       
-      // Assuming response contains { access_token: '...' } - adjust based on actual API
-      const { accessToken, refreshToken } = response.data || response;
+      // API returns access_token (snake_case)
+      const { access_token, refresh_token } = response.data || response;
+      const accessToken = access_token;
+      const refreshToken = refresh_token;
+      
+      if (!accessToken) {
+          throw new Error('No access token received');
+      }
       
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);

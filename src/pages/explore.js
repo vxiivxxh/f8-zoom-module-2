@@ -26,7 +26,10 @@ export const renderExplore = async (router) => {
          <!-- Chips Navigation -->
          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
             ${chips.map((chip, idx) => `
-               <button class="px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${idx === 0 ? 'bg-white text-black hover:bg-gray-200' : ''}">
+               <button 
+                  class="category-chip px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${idx === 0 ? 'bg-white text-black hover:bg-gray-200' : ''}"
+                  data-category="${chip}"
+               >
                   ${chip}
                </button>
             `).join('')}
@@ -47,6 +50,7 @@ export const renderExplore = async (router) => {
      // Event Delegation for Song Cards
      const main = document.querySelector('main');
      if (main) {
+         // Song Card Click
          main.addEventListener('click', (e) => {
              const card = e.target.closest('.song-card');
              if (card) {
@@ -57,6 +61,33 @@ export const renderExplore = async (router) => {
                      });
                  } catch (err) {
                      console.error('Failed to play song', err);
+                 }
+             }
+
+             // Category Chip Click
+             const chip = e.target.closest('.category-chip');
+             if (chip) {
+                 const category = chip.dataset.category;
+                 
+                 // Update active state
+                 document.querySelectorAll('.category-chip').forEach(btn => {
+                     btn.classList.remove('bg-white', 'text-black', 'hover:bg-gray-200');
+                     btn.classList.add('bg-yt-hover', 'text-white');
+                 });
+                 chip.classList.remove('bg-yt-hover', 'text-white');
+                 chip.classList.add('bg-white', 'text-black', 'hover:bg-gray-200');
+
+                 // Filter logic (Client-side simulation since API support is limited for these specific chips)
+                 const sectionTitle = document.querySelector('h2');
+                 if (sectionTitle) {
+                    if (category === 'Mới phát hành') {
+                        sectionTitle.textContent = 'Mới phát hành';
+                        // Keep original order
+                    } else {
+                        // For demo purposes, just randomize or show alert for unimplemented categories
+                        // In a real app, we'd fetch specific endpoints like /explore/moods/${category}
+                        sectionTitle.textContent = `${category} (Demo)`;
+                    }
                  }
              }
          });

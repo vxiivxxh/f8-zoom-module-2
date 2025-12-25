@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === 'true' ? '/f8-zoom-module-2/' : '/',
+  base: '/f8-zoom-module-2/',
 })

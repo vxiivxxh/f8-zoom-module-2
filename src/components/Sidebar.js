@@ -39,10 +39,10 @@ export const Sidebar = () => {
         </a>
 
         <!-- Divider -->
-        <div class="my-3 mx-4 border-t border-gray-700"></div>
+        <div class="my-6 mx-4 border-t border-gray-700"></div>
 
         <!-- New Playlist Button -->
-        <div class="px-0 mb-4 hide-on-collapse">
+        <div class="px-0 mb-4 mt-2 hide-on-collapse">
              <button class="flex items-center justify-center gap-2 w-full bg-[#212121] hover:bg-[#303030] text-white font-medium rounded-3xl py-2 transition-colors border border-white/10">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                 <span class="text-sm">Danh sách phát mới</span>

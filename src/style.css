@@ -48,8 +48,12 @@ body.sidebar-collapsed aside {
         border-right: none !important;
 }
 
+/* Main Content Padding - Handles sidebar width + 10vw gap */
+.pl-sidebar {
+    padding-left: calc(240px + 10vw);
+}
 body.sidebar-collapsed .pl-sidebar {
-    padding-left: 72px;
+    padding-left: calc(72px + 10vw);
 }
 
 body.sidebar-collapsed .left-sidebar {

@@ -115,7 +115,9 @@ export const renderHome = async (router) => {
 
 // Helper: Render Section with Slider
 const renderSection = (title, items, id, subtitle = '') => {
-    if (!items || items.length === 0) return '';
+    // Limit to 6 items per section for performance and UX (User requested 3-5, 6 ensures full row + 1 on generic screens or just enough to look populated)
+    const displayItems = items.slice(0, 6);
+
     return `
     <section>
         <div class="flex items-end justify-between mb-4">
@@ -124,18 +126,18 @@ const renderSection = (title, items, id, subtitle = '') => {
                 <h2 class="text-2xl font-bold leading-tight">${title}</h2>
             </div>
             <div class="flex items-center gap-2">
-                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white" 
+                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white disabled:opacity-50" 
                     data-scroll="left" data-target="${id}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
-                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white" 
+                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white disabled:opacity-50" 
                     data-scroll="right" data-target="${id}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
         </div>
-        <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 -mr-8 pr-8">
-            ${items.map(item => renderCard(item)).join('')}
+        <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 snap-x">
+            ${displayItems.map(item => renderCard(item)).join('')}
         </div>
     </section>
     `;

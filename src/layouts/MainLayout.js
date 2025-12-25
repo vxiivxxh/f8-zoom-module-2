@@ -10,11 +10,11 @@ export const MainLayout = (content, router) => {
   
   const render = () => {
     app.innerHTML = `
-        <div class="flex h-screen w-screen bg-yt-base text-yt-text-primary overflow-hidden relative">
+        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative">
             <div class="aurora-bg"></div>
             ${Sidebar()}
             
-            <div class="flex flex-col flex-1 pl-sidebar ml-[10vw] transition-all relative z-10">
+            <div class="flex flex-col flex-1 pl-sidebar transition-all relative z-10">
                 ${Header()}
                 
                 <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth">

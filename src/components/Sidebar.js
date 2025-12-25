@@ -1,12 +1,12 @@
 
 
-// Helper to determine active class usually handled by router, 
-// but for now we'll hardcode style classes similar to Navigo or let Navigo handle 'active' if configured.
-// We will stick to the visual structure.
+// Helper để xác định active class thường được xử lý bởi router,
+// nhưng hiện tại chúng ta sẽ hardcode class style tương tự Navigo hoặc để Navigo xử lý 'active' nếu được cấu hình.
+// Chúng ta sẽ giữ nguyên cấu trúc hiển thị.
 
 export const Sidebar = () => {
   return `
-    <aside class="fixed top-0 left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-50 border-r border-gray-800 transition-all duration-300">
+    <aside class="w-sidebar h-full bg-yt-sidebar text-yt-text-secondary flex flex-col pt-2 z-sidebar border-r border-gray-800 transition-all duration-300 flex-shrink-0">
       
       <!-- Top: Hamburger & Logo -->
       <div class="flex items-center gap-4 px-4 pl-6 mb-2 h-16 shrink-0">

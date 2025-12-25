@@ -41,24 +41,17 @@ body {
         /* Chrome, Safari and Opera */
     }
 }
+/* Main Content Padding - No longer needed with Flexbox */
+/* .pl-sidebar rules removed */
 /* Sidebar Collapsed State Overrides */
 body.sidebar-collapsed aside {
     width: 72px;
     background-color: transparent !important;
-        border-right: none !important;
+    border-right: none !important;
 }
 
-/* Main Content Padding - Handles sidebar width + 10vw gap */
-.pl-sidebar {
-    padding-left: calc(240px + 10vw);
-}
-body.sidebar-collapsed .pl-sidebar {
-    padding-left: calc(72px + 10vw);
-}
+/* Ensure content adjusts automatically via flexbox */
 
-body.sidebar-collapsed .left-sidebar {
-    left: 72px;
-}
 
 /* Hide text labels in collapsed sidebar normally, but we want them visible and small below icon */
 body.sidebar-collapsed aside nav a span {
@@ -88,20 +81,9 @@ body.sidebar-collapsed aside nav a svg {
 }
 
 /* Remove alignment override to keep position consistent */
+/* Remove alignment override to keep position consistent */
 body.sidebar-collapsed aside>div:first-child {
-    /* We want to keep original padding/alignment, so we remove the forced centering */
-        /* If we want to hide logo, we can do it here, but user asked to keep it. */
-        /* padding-left: 0; padding-right: 0; justify-content: center; */
-        /* Resetting/Removing these properties effectively. */
-        /* Since we can't easily 'delete' nicely with replace tool if lines vary, 
-           I will set them to inherit or unset, OR just delete the block content/comment it out. 
-           Best is to empty the block or set values that mimic expanded state if needed. 
-           Actually, standard replacement is better. */
-    }
-    
-    /* Better yet, just delete the rule or make it do nothing */
-    body.sidebar-collapsed aside>div:first-child {
-        /* No overrides */
+    /* No overrides needed */
 }
 /* Aurora Background Effect */
 .aurora-bg {

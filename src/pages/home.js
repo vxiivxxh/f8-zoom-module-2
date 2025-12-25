@@ -4,7 +4,7 @@ import { MainLayout } from '../layouts/MainLayout';
 import { authStore } from '../store/authStore';
 
 export const renderHome = async (router) => {
-  // Show Loading State utilizing the Layout
+  // Hiển thị trạng thái Loading sử dụng Layout
   MainLayout(`
       <div class="flex items-center justify-center h-64">
           <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -12,7 +12,7 @@ export const renderHome = async (router) => {
   `, router);
 
   try {
-    // Parallel data fetching
+    // Fetch dữ liệu song song
     const [albumsRes, hitsRes, quickPicksRes, moodsRes] = await Promise.all([
        apiClient.get('/home/albums-for-you'),
        apiClient.get('/home/todays-hits'),
@@ -20,14 +20,14 @@ export const renderHome = async (router) => {
        apiClient.get('/moods')
     ]);
 
-    // API returns array directly for these endpoints
+    // API trả về mảng trực tiếp cho các endpoint này
     const albums = Array.isArray(albumsRes) ? albumsRes : (albumsRes.data || []);
     const hits = Array.isArray(hitsRes) ? hitsRes : (hitsRes.data || []);
     const quickPicks = Array.isArray(quickPicksRes) ? quickPicksRes : (quickPicksRes.data || []);
-    // Fix: Access .items directly from response object
+    // Sửa lỗi: Truy cập trực tiếp .items từ object phản hồi
     const moods = (moodsRes && moodsRes.items) ? moodsRes.items : (Array.isArray(moodsRes) ? moodsRes : []);
     
-    // User personalization
+    // Cá nhân hóa người dùng
     const user = authStore.user;
     const greeting = user ? `Xin chào, ${user.name}` : 'Xin chào';
 
@@ -63,10 +63,10 @@ export const renderHome = async (router) => {
 
      MainLayout(content, router);
 
-     // Event Delegation for Song Cards & Scroll Buttons
+     // Event Delegation cho Song Cards & Nút cuộn
      const main = document.querySelector('main');
      if (main) {
-         // Handle Card Clicks
+         // Xử lý click vào Card
          main.addEventListener('click', (e) => {
              const card = e.target.closest('.song-card');
              if (card) {
@@ -81,11 +81,11 @@ export const renderHome = async (router) => {
              }
          });
 
-         // Handle Scroll Buttons
+         // Xử lý nút cuộn
          const scrollBtns = main.querySelectorAll('[data-scroll]');
          scrollBtns.forEach(btn => {
              btn.addEventListener('click', (e) => {
-                 const direction = e.currentTarget.dataset.scroll; // 'left' or 'right'
+                 const direction = e.currentTarget.dataset.scroll; // 'left' hoặc 'right'
                  const targetId = e.currentTarget.dataset.target;
                  const container = document.getElementById(targetId);
                  
@@ -113,10 +113,10 @@ export const renderHome = async (router) => {
   }
 };
 
-// Helper: Render Section with Slider
+// Helper: Render Section với Slider
 const renderSection = (title, items, id, subtitle = '') => {
-    // Limit to 6 items per section for performance and UX (User requested 3-5, 6 ensures full row + 1 on generic screens or just enough to look populated)
-    const displayItems = items.slice(0, 6);
+    // Giới hạn 6 item mỗi section vì hiệu năng và UX (User yêu cầu 3-5, 6 đảm bảo đầy hàng + 1 trên màn hình thường hoặc đủ để trông có dữ liệu)
+    const displayItems = items.slice(0, 12); // Tăng slice để hỗ trợ responsive logic
 
     return `
     <section>
@@ -137,13 +137,26 @@ const renderSection = (title, items, id, subtitle = '') => {
             </div>
         </div>
         <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 snap-x">
-            ${displayItems.map(item => renderCard(item)).join('')}
+            ${displayItems.map((item, index) => {
+                // Logic hiển thị responsive:
+                // Mobile (<640px): Hiển thị 3 items (Indices 0, 1, 2)
+                // sm (>=640px): Hiển thị 4 items (Index 3)
+                // md (>=768px): Hiển thị 5 items (Index 4)
+                // lg (>=1024px): Hiển thị 6 items (Index 5)
+                let responsiveClass = '';
+                if (index > 2) responsiveClass = 'hidden sm:block';
+                if (index > 3) responsiveClass = 'hidden md:block';
+                if (index > 4) responsiveClass = 'hidden lg:block';
+                
+                // Bọc card trong div responsive
+                return `<div class="${responsiveClass}">${renderCard(item)}</div>`;
+            }).join('')}
         </div>
     </section>
     `;
 };
 
-// Helper: Card Component
+// Helper: Component Card
 const renderCard = (item) => {
     const rawTitle = item.title || item.name || 'Không có tiêu đề';
     const title = escapeHTML(rawTitle);

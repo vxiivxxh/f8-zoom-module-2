@@ -12,12 +12,15 @@ export const MainLayout = (content, router) => {
     app.innerHTML = `
         <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative">
             <div class="aurora-bg"></div>
+            
+            <!-- Sidebar is now a flex item, not fixed -->
             ${Sidebar()}
             
-            <div class="flex flex-col flex-1 pl-sidebar transition-all relative z-10">
+            <!-- Main Content Wrapper: Flex column, takes remaining space -->
+            <div class="flex flex-col flex-1 min-w-0 transition-all relative z-10">
                 ${Header()}
                 
-                <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth">
+                <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth scrollbar-none">
                     ${content}
                 </main>
             </div>
@@ -26,13 +29,13 @@ export const MainLayout = (content, router) => {
         </div>
     `;
 
-    // Attach events
+    // Gắn sự kiện
     setupHeaderEvents(router);
     if (playerStore.state.currentSong) {
         setupPlayerEvents();
     }
     
-    // Highlight active link
+    // Highlight link đang active
     const currentPath = window.location.pathname;
     const links = document.querySelectorAll('nav a');
     links.forEach(link => {
@@ -44,19 +47,19 @@ export const MainLayout = (content, router) => {
 
   render();
 
-  // Subscribe to player state changes to re-render player only?
-  // Re-rendering entire layout on player change is expensive and kills scroll state.
-  // Better approach: Separate Player rendering or update DOM safely.
-  // For now, let's just make the Player a separate mount point or subscribe inside it.
-  // BUT MainLayout is called by pages. 
-  // Optimization: Only update the Player container if it exists.
+  // Subscribe thay đổi state player để re-render player?
+  // Re-render toàn bộ layout khi thay đổi player rất tốn kém và làm mất trạng thái cuộn.
+  // Cách tốt hơn: Tách biệt render Player hoặc cập nhật DOM an toàn.
+  // Hiện tại, hãy coi Player là một mount point riêng biệt hoặc subscribe bên trong nó.
+  // NHƯNG MainLayout được gọi bởi các trang.
+  // Tối ưu hóa: Chỉ cập nhật container Player nếu nó tồn tại.
   
   const playerUnsub = playerStore.subscribe((state) => {
-      // Logic to update Player UI without clearing main content
+      // Logic cập nhật UI Player mà không xóa nội dung chính
       const existingPlayer = document.querySelector('.bg-yt-player.fixed.bottom-0');
       if (state.currentSong && !existingPlayer) {
-          // Player appeared for first time -> Re-render layout to adjust padding? 
-          // Or just append Player.
+          // Player xuất hiện lần đầu -> Re-render layout để điều chỉnh padding?
+          // Hoặc chỉ cần append Player.
            const appDiv = document.querySelector('#app > div');
            if(appDiv) {
                const tempDiv = document.createElement('div');
@@ -65,7 +68,7 @@ export const MainLayout = (content, router) => {
                setupPlayerEvents();
            }
       } else if (state.currentSong && existingPlayer) {
-          // Update existing player content
+          // Cập nhật nội dung player hiện có
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = Player();
           existingPlayer.replaceWith(tempDiv.firstElementChild);

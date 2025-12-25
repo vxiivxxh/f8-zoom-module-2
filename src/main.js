@@ -9,7 +9,7 @@ import { renderLibrary } from './pages/library';
 
 const router = new Navigo(import.meta.env.BASE_URL || '/');
 
-// Route Definitions
+// Định nghĩa Route
 router
   .on({
     '/': () => {
@@ -37,29 +37,27 @@ router
     }
   });
 
-// Auth Guard / Hooks
+// Bảo vệ Route / Hooks
 router.hooks({
   before: async (done, params) => {
-    // Determine if the route is protected (for future)
-    // For now, we just ensure we have the latest user state
+    // Xác định xem route có được bảo vệ không (cho tương lai)
+    // Hiện tại, chúng ta chỉ đảm bảo có trạng thái user mới nhất
     if (!authStore.isAuthenticated && localStorage.getItem('accessToken')) {
-      // Try to restore session
+      // Cố gắng khôi phục phiên làm việc
       await authStore.init();
     }
     done();
   }
 });
 
-// Initialize
-// Wait for initial auth check if needed, then resolve
+// Khởi tạo
+// Chờ kiểm tra auth ban đầu nếu cần, sau đó resolve
 (async () => {
-  // If we have a token, wait for init to complete to avoid flash of "Guest"
+  // Nếu có token, chờ init hoàn tất để tránh nhấp nháy trạng thái "Guest"
   if (localStorage.getItem('accessToken')) {
-    // We can subscribe to wait for loading to finish, or just await init if we exposed it
-    // authStore.init() is called in constructor but async. 
-    // Let's rely on the store's state or a simple delay/check for this Phase.
-    // Ideally authStore.init() should be awaitable or we await a promise.
-    // For simplicity in this vanilla app, we'll let the hook handle it or just render.
+    // Chúng ta có thể subcribe để chờ loading hoàn tất, hoặc chỉ await init nếu đã expose nó
+    // authStore.init() được gọi trong constructor nhưng là async.
+    // Hãy dựa vào state của store hoặc độ trễ đơn giản cho giai đoạn này.
   }
   router.resolve();
 })();

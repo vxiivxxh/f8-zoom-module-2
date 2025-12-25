@@ -51,9 +51,9 @@ export const Header = () => {
   `;
 };
 
-// Bind events after rendering
+// Gắn sự kiện sau khi render
 export const setupHeaderEvents = (router) => {
-    // Sidebar Toggle
+    // Toggle Sidebar
     const toggleBtn = document.getElementById('sidebar-toggle');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', (e) => {
@@ -64,7 +64,7 @@ export const setupHeaderEvents = (router) => {
     const logoutBtn = document.getElementById('header-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-             // Close dropdown just in case
+             // Đóng dropdown đề phòng
             const dropdown = document.getElementById('profile-dropdown');
             if (dropdown) dropdown.classList.add('hidden');
             
@@ -78,36 +78,32 @@ export const setupHeaderEvents = (router) => {
     const dropdown = document.getElementById('profile-dropdown');
 
     if (trigger && dropdown) {
-        // Toggle on click
+        // Toggle khi click
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdown.classList.toggle('hidden');
         });
 
-        // Close on click outside
-        // We need a named function to remove it later if we wanted to be perfectly clean,
-        // but for this simple app, a persistent document listener is acceptable/common trade-off
-        // provided we check if element exists or we accept it runs always.
-        // Actually, since this setupHeaderEvents is called multiple times (re-render),
-        // adding document listener repeatedly is BAD. It will stack up.
+        // Đóng khi click ra ngoài
+        // Chúng ta cần một hàm có tên để gỡ bỏ sau này nếu muốn code sạch hoàn toàn,
+        // nhưng với app đơn giản này, một document listener liên tục là chấp nhận được
+        // miễn là kiểm tra element có tồn tại hay không.
+        // Thực tế, vì setupHeaderEvents được gọi nhiều lần (re-render),
+        // adding document listener liên tục là KHÔNG TỐT. Nó sẽ chồng chất.
         
-        // Solution: Remove old listener if exists? Hard to reference.
-        // Better: Use a global handler or check if listener already attached?
-        // Or specific logic.
+        // Giải pháp: Gỡ bỏ listener cũ nếu tồn tại? Khó tham chiếu.
+        // Tốt hơn: Dùng giải pháp clean hơn hoặc kiểm tra nếu listener đã gắn.
         
-        // Let's use a simpler approach: 
-        // We can attach `onclick` property to document.body, but that overrides others.
-        // Best for SPA needing cleanup: Attach event listener that checks if trigger/dropdown exists.
-        // If they don't exist (because Header removed), it does nothing.
+        // Hãy dùng cách đơn giản hơn: 
+        // Chúng ta có thể gắn thuộc tính `onclick` cho document.body, nhưng nó ghi đè người khác.
+        // Tốt nhất cho SPA cần dọn dẹp: Gắn event listener kiểm tra trigger/dropdown tồn tại.
+        // Nếu không tồn tại (vì Header bị xóa), nó không làm gì cả.
         
-        // Even better: MainLayout re-renders Header. 
-        // Let's just create the handler and attach it. 
-        // To avoid duplicates, we can attach to `app` or remove previous.
-        // BUT, since we cannot easily remove anonymous functions or previous references here:
-        // Let's check if we already initialized? No state here.
+        // Thậm chí tốt hơn: MainLayout re-render Header. 
+        // Hãy tạo handler và gắn nó. 
+        // Để tránh trùng lặp, chúng ta có thể gắn vào `app` hoặc gỡ bỏ cái trước.
         
-        // Alternative: Use a 'once' listener on document that re-attaches? No.
-        // Let's rely on the fact that click outside is global.
+        // WORKAROUND cho việc gắn lại: Dùng thuộc tính tùy chỉnh trên document để lưu handler
         
         const closeDropdown = (e) => {
              if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
@@ -115,13 +111,7 @@ export const setupHeaderEvents = (router) => {
              }
         };
         
-        // Remove existing to prevent duplicates if MainLayout calls this often
-        // (Note: this only works if function reference is same. It is NOT same here)
-        // Correct fix: Store controller or use unique event name if possible. 
-        // Or just `trigger.onclick` which handles the open.
-        // For close, we need document level.
-        
-        // WORKAROUND for re-attachment: Use a custom property on document to store the handler?
+        // Gỡ bỏ cái cũ để tránh trùng lặp nếu MainLayout gọi lại hàm này thường xuyên
         if (document._headerClickOutside) {
             document.removeEventListener('click', document._headerClickOutside);
         }

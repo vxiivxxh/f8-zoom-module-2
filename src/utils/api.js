@@ -1,19 +1,19 @@
 const API_BASE_URL = 'https://youtube-music.f8team.dev/api';
 
 /**
- * Custom fetch wrapper to handle common API logic (headers, auth, errors)
+ * Wrapper fetch tùy chỉnh để xử lý logic API chung (headers, auth, lỗi)
  */
 export const apiClient = {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     
-    // Default headers
+    // Headers mặc định
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    // Add Authorization header if token exists
+    // Thêm Authorization header nếu có token
     const token = localStorage.getItem('accessToken');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -29,12 +29,12 @@ export const apiClient = {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'API Error');
+        throw new Error(data.message || 'Lỗi API');
       }
 
       return data;
     } catch (error) {
-      console.error('API Request Failed:', error);
+      console.error('Yêu cầu API thất bại:', error);
       throw error;
     }
   },

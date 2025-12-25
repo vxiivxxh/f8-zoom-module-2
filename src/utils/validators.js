@@ -1,5 +1,5 @@
 /**
- * Validates an email address.
+ * Xác thực địa chỉ email.
  * @param {string} email 
  * @returns {boolean}
  */
@@ -9,8 +9,8 @@ export const validateEmail = (email) => {
 };
 
 /**
- * Validates a password.
- * Rules: At least 6 characters.
+ * Xác thực mật khẩu.
+ * Quy tắc: Ít nhất 6 ký tự.
  * @param {string} password 
  * @returns {boolean}
  */
@@ -19,8 +19,8 @@ export const validatePassword = (password) => {
 };
 
 /**
- * Validates a name.
- * Rules: At least 2 characters.
+ * Xác thực tên.
+ * Quy tắc: Ít nhất 2 ký tự.
  * @param {string} name 
  * @returns {boolean}
  */

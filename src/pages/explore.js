@@ -12,13 +12,13 @@ export const renderExplore = async (router) => {
   try {
      const [newReleasesRes] = await Promise.all([
         apiClient.get('/explore/new-releases'),
-        // Add more calls like Moods/Genres later
+        // Thêm các cuộc gọi khác như Moods/Genres sau này
      ]);
 
-     // API returns { items: [...] }
+     // API trả về { items: [...] }
      const newReleases = newReleasesRes.items || newReleasesRes.data || [];
 
-     // Mock chips for Moods since API might not include them directly yet
+     // Mock chips cho Tâm trạng vì API có thể chưa bao gồm trực tiếp
      const chips = ['Mới phát hành', 'Bảng xếp hạng', 'Tâm trạng', 'Pop', 'Rock', 'Hiphop v.v.'];
 
      const content = `
@@ -35,7 +35,7 @@ export const renderExplore = async (router) => {
             `).join('')}
          </div>
 
-         <!-- Section: New Releases -->
+         <!-- Section: Mới phát hành -->
          <section>
             <h2 class="text-2xl font-bold mb-4">Mới phát hành</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -47,10 +47,10 @@ export const renderExplore = async (router) => {
      
      MainLayout(content, router);
 
-     // Event Delegation for Song Cards
+     // Ủy quyền sự kiện cho Song Cards
      const main = document.querySelector('main');
      if (main) {
-         // Song Card Click
+         // Click vào Song Card
          main.addEventListener('click', (e) => {
              const card = e.target.closest('.song-card');
              if (card) {
@@ -64,12 +64,12 @@ export const renderExplore = async (router) => {
                  }
              }
 
-             // Category Chip Click
+             // Click vào Category Chip
              const chip = e.target.closest('.category-chip');
              if (chip) {
                  const category = chip.dataset.category;
                  
-                 // Update active state
+                 // Cập nhật trạng thái active
                  document.querySelectorAll('.category-chip').forEach(btn => {
                      btn.classList.remove('bg-white', 'text-black', 'hover:bg-gray-200');
                      btn.classList.add('bg-yt-hover', 'text-white');
@@ -77,15 +77,15 @@ export const renderExplore = async (router) => {
                  chip.classList.remove('bg-yt-hover', 'text-white');
                  chip.classList.add('bg-white', 'text-black', 'hover:bg-gray-200');
 
-                 // Filter logic (Client-side simulation since API support is limited for these specific chips)
+                 // Logic lọc (Mô phỏng phía client vì hỗ trợ API hạn chế cho các chips cụ thể này)
                  const sectionTitle = document.querySelector('h2');
                  if (sectionTitle) {
                     if (category === 'Mới phát hành') {
                         sectionTitle.textContent = 'Mới phát hành';
-                        // Keep original order
+                        // Giữ nguyên thứ tự ban đầu
                     } else {
-                        // For demo purposes, just randomize or show alert for unimplemented categories
-                        // In a real app, we'd fetch specific endpoints like /explore/moods/${category}
+                        // Cho mục đích demo, chỉ random hoặc hiện thông báo cho các danh mục chưa thực hiện
+                        // Trong app thực tế, chúng ta sẽ fetch các endpoint cụ thể như /explore/moods/${category}
                         sectionTitle.textContent = `${category} (Demo)`;
                     }
                  }
@@ -104,7 +104,7 @@ export const renderExplore = async (router) => {
   }
 };
 
-// Reused simple card (Should be a shared component in real app)
+// Card đơn giản được sử dụng lại (Nên là một component chia sẻ trong app thực tế)
 const renderCard = (item) => {
     const rawTitle = item.title || item.name || 'No Title';
     const title = escapeHTML(rawTitle);

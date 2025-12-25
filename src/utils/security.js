@@ -1,7 +1,7 @@
 /**
- * Escapes unsafe characters in a string to prevent XSS.
- * @param {string} str - The input string to escape.
- * @returns {string} - The escaped string.
+ * Mã hóa các ký tự không an toàn trong chuỗi để ngăn chặn XSS.
+ * @param {string} str - Chuỗi đầu vào cần mã hóa.
+ * @returns {string} - Chuỗi đã được mã hóa.
  */
 export const escapeHTML = (str) => {
   if (typeof str !== 'string') {

@@ -10,12 +10,12 @@ class PlayerStore {
       duration: 0,
     };
     this.listeners = [];
-    this.player = null; // YouTube Player instance
+     this.player = null; // Instance YouTube Player
     this.initPlayer();
   }
 
   initPlayer() {
-     // Load YouTube IFrame API
+     // Tải YouTube IFrame API
      const tag = document.createElement('script');
      tag.src = "https://www.youtube.com/iframe_api";
      const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -57,11 +57,11 @@ class PlayerStore {
         });
      };
      
-     // Create a hidden container for the player if it doesn't exist
+     // Tạo container ẩn cho player nếu chưa tồn tại
      if (!document.getElementById('yt-player-container')) {
          const div = document.createElement('div');
          div.id = 'yt-player-container';
-         // Default to hidden class, managed by CSS
+         // Mặc định ẩn, quản lý bằng CSS
          div.className = 'yt-video-container hidden-video';
          document.body.appendChild(div);
      }
@@ -98,9 +98,9 @@ class PlayerStore {
     this.notify();
   }
 
-  // Actions
+  // Hành động
   play(song) {
-    // If playing the same song, just resume
+    // Nếu đang chơi cùng một bài, chỉ cần resume
     if (this.state.currentSong && this.state.currentSong.id === song.id) {
        if (this.player && typeof this.player.playVideo === 'function') {
            this.player.playVideo();
@@ -109,7 +109,7 @@ class PlayerStore {
       return;
     }
 
-    // New song
+    // Bài hát mới
     this.setState({
       currentSong: song,
       isPlaying: true,
@@ -118,15 +118,15 @@ class PlayerStore {
     });
     
     if (this.player && typeof this.player.loadVideoById === 'function') {
-        // Assuming 'link' or 'encodeId' can be used to find proper video ID.
-        // YouTube Music clones usually map encodeId to a Video ID via another API or use the ID directly if available.
-        // For this task, let's assume `encodeId` IS the video ID or we have `videoId` prop.
-        // Looking at common APIs, it might be `encodeId`.
+        // Giả sử 'link' hoặc 'encodeId' có thể dùng để tìm Video ID.
+        // YouTube Music clones thường map encodeId sang Video ID qua API khác hoặc dùng ID trực tiếp nếu có.
+        // Với bài tập này, giả sử `encodeId` LÀ video ID hoặc chúng ta có prop `videoId`.
+        // Nhìn vào API thông thường, nó có thể là `encodeId`.
         const videoId = song.id; 
         this.player.loadVideoById(videoId);
     }
 
-    // Queue logic
+    // Logic hàng đợi
     if (this.state.queue.length === 0) {
         this.state.queue = [song];
         this.state.currentIndex = 0;
@@ -147,7 +147,7 @@ class PlayerStore {
     } else {
         if (this.player) this.player.playVideo();
     }
-    // State update happens in onStateChange, but optimistic update is fine too
+    // Cập nhật state xảy ra trong onStateChange, nhưng cập nhật lạc quan cũng ổn
     this.setState({ isPlaying: !this.state.isPlaying });
   }
 

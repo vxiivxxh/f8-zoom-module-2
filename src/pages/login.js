@@ -65,7 +65,7 @@ export const renderLogin = (router) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
-    // Clear previous errors
+    // Xóa lỗi cũ
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
     
@@ -82,7 +82,7 @@ export const renderLogin = (router) => {
         return;
     }
     
-    // Disable button to prevent double submit
+    // Vô hiệu hóa nút để tránh submit 2 lần
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;

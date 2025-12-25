@@ -11,7 +11,7 @@ class AuthStore {
     this.init();
   }
 
-  // Publisher: Subscribe to state changes
+  // Publisher: Đăng ký nhận thay đổi trạng thái
   subscribe(listener) {
     this.listeners.push(listener);
     return () => {
@@ -19,19 +19,19 @@ class AuthStore {
     };
   }
 
-  // Notify all listeners
+  // Thông báo cho tất cả listeners
   notify() {
     this.listeners.forEach(listener => listener(this.state));
   }
 
-  // Initialize: Check for existing token
+  // Khởi tạo: Kiểm tra token hiện có
   async init() {
     const token = localStorage.getItem('accessToken');
     if (token) {
       try {
         await this.fetchCurrentUser();
       } catch (error) {
-        console.error('Session expired or invalid:', error);
+        console.error('Session hết hạn hoặc không hợp lệ:', error);
         this.logout();
       }
     } else {
@@ -49,7 +49,7 @@ class AuthStore {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       
-      // API returns access_token (snake_case)
+      // API trả về access_token (snake_case)
       const { access_token, refresh_token } = response.data || response;
       const accessToken = access_token;
       const refreshToken = refresh_token;
@@ -79,7 +79,7 @@ class AuthStore {
         confirmPassword 
       });
       
-      // Auto-login: API returns tokens and user
+      // Tự động đăng nhập: API trả về tokens và user
       const { access_token, refresh_token, user } = response.data || response;
       const accessToken = access_token;
       const refreshToken = refresh_token;
@@ -88,7 +88,7 @@ class AuthStore {
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);
           
-          // Set user state directly if returned, or fetch it
+          // Cập nhật state user trực tiếp nếu có, hoặc fetch lại
           if (user) {
               this.setState({ 
                 user: user, 
@@ -99,7 +99,7 @@ class AuthStore {
               await this.fetchCurrentUser();
           }
       } else {
-          // If no token, just stop loading (shouldn't happen with current API)
+          // Nếu không có token, chỉ dừng loading (thường không xảy ra với API hiện tại)
           this.setState({ isLoading: false });
       }
 
@@ -111,7 +111,7 @@ class AuthStore {
   }
 
   async logout() {
-    // Optional: Call logout API if exists
+    // Tùy chọn: Gọi API logout nếu có
     // await apiClient.post('/auth/logout'); 
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -125,8 +125,8 @@ class AuthStore {
   async fetchCurrentUser() {
     try {
       const response = await apiClient.get('/auth/me');
-      // Fix: apiClient returns data directly. If response is the user object, use it.
-      // If response has .data property, use that (handled by || response check roughly, but safeguards needed)
+      // Sửa lỗi: apiClient trả về data trực tiếp. Nếu response là object user, dùng nó.
+      // Nếu response có thuộc tính .data, dùng thuộc tính đó
       const userData = response.data || response;
       this.setState({ 
         user: userData, 

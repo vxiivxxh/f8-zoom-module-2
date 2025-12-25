@@ -91,7 +91,7 @@ export const renderRegister = (router) => {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
     
-    // Basic validation
+    // Validation cơ bản
     let isValid = true;
     let errorMessage = '';
 
@@ -115,25 +115,26 @@ export const renderRegister = (router) => {
       return;
     }
 
-    // Clear previous errors
+    // Xóa lỗi cũ
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
     
-    // Disable button
+    // Vô hiệu hóa nút
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đang đăng ký & đăng nhập...';
 
-    // Note: register args depend on authStore implementation. 
-    // We updated authStore to match: register(name, email, password, confirmPassword)
+    // Lưu ý: tham số register phụ thuộc vào cài đặt authStore.
+    // Chúng ta đã cập nhật authStore khớp với: register(name, email, password, confirmPassword)
     const result = await authStore.register(name, email, password, confirmPassword);
 
     if (result.success) {
-      // Auto login after register or redirect to login? 
-      // User requirements didn't specify, but UX usually prefers auto-login or redirect to login.
-      // Let's redirect to login for clarity as authStore.register doesn't auto-set token usually unless API returns it.
-      // Actually checking authStore.js I wrote earlier: it DOES NOT set token on register. So redirect to login.
+      // Tự động đăng nhập sau khi đăng ký hoặc chuyển hướng?
+      // Yêu cầu người dùng UX thường thích tự động đăng nhập hoặc chuyển hướng đến đăng nhập.
+      // Hãy chuyển hướng đến đăng nhập cho rõ ràng vì authStore.register thường không tự set token trừ khi API trả về nó.
+      // Kiểm tra authStore.js: nó KHÔNG set token khi đăng ký (hoặc có? - xem lại authStore). Ok, Code cũ không set. Code mới Auth của tôi có auto login.
+      // Nhưng để an toàn cứ redirect về login hoặc home (nếu auto login).
       router.navigate('/');
     } else {
       errorDiv.textContent = result.error || 'Đăng ký thất bại.';

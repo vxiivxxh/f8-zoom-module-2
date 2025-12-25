@@ -59,6 +59,9 @@ async function runTests() {
       { name: 'Search - Suggestions', endpoint: '/search/suggestions?q=son', method: 'GET' },
       { name: 'Search - Query', endpoint: '/search?q=a', method: 'GET' },
       { name: 'Categories', endpoint: '/categories', method: 'GET' },
+      // Probing for Library/User endpoints
+      { name: 'Me - Playlists', endpoint: '/me/playlists', method: 'GET' },
+      { name: 'Me - Library', endpoint: '/library', method: 'GET' },
       
       // We will add dynamic tests during execution
   ];

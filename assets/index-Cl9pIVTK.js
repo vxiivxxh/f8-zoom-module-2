@@ -358,4 +358,4 @@
          <h3 class="font-medium text-white truncate hover:underline">${t}</h3>
          <p class="text-sm text-yt-text-secondary truncate">${r}</p>
       </div>
-    `},k=new Xe("/");k.on({"/":()=>{it(k)},"/explore":()=>{at(k)},"/login":()=>{S.isAuthenticated?k.navigate("/"):Je(k)},"/register":()=>{S.isAuthenticated?k.navigate("/"):Qe(k)}});k.hooks({before:async(e,t)=>{!S.isAuthenticated&&localStorage.getItem("accessToken")&&await S.init(),e()}});(async()=>(localStorage.getItem("accessToken"),k.resolve()))();
+    `},k=new Xe("/f8-zoom-module-2/");k.on({"/":()=>{it(k)},"/explore":()=>{at(k)},"/login":()=>{S.isAuthenticated?k.navigate("/"):Je(k)},"/register":()=>{S.isAuthenticated?k.navigate("/"):Qe(k)}});k.hooks({before:async(e,t)=>{!S.isAuthenticated&&localStorage.getItem("accessToken")&&await S.init(),e()}});(async()=>(localStorage.getItem("accessToken"),k.resolve()))();

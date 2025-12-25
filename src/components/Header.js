@@ -21,15 +21,25 @@ export const Header = () => {
         </div>
       </div>
 
-      <!-- User Profile -->
+      <!-- Right Side Icons -->
       <div class="flex items-center gap-4">
+          <!-- Cast Button -->
+          <button class="p-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors" title="Cast to device">
+             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.92-11-11-11z"/></svg>
+          </button>
+
+          <!-- User Profile -->
          ${user ? `
-            <div class="flex items-center gap-3 cursor-pointer group relative">
+            <div id="profile-trigger" class="flex items-center gap-3 cursor-pointer relative select-none">
                 <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
                     ${initial}
                 </div>
-                <!-- Dropdown (Simple implementation) -->
-                <div class="absolute right-0 top-10 w-48 bg-yt-player rounded shadow-lg py-1 hidden group-hover:block border border-gray-700">
+                <!-- Dropdown -->
+                <div id="profile-dropdown" class="absolute right-0 top-10 w-48 bg-yt-player rounded shadow-lg py-1 hidden border border-gray-700">
+                     <div class="px-4 py-3 border-b border-gray-700">
+                        <p class="text-sm text-white font-medium truncate">${user.name}</p>
+                        <p class="text-xs text-gray-400 truncate">${user.email}</p>
+                     </div>
                      <button id="header-logout-btn" class="block w-full text-left px-4 py-2 text-sm text-yt-text-primary hover:bg-gray-700">Đăng xuất</button>
                 </div>
             </div>
@@ -46,8 +56,68 @@ export const setupHeaderEvents = (router) => {
     const logoutBtn = document.getElementById('header-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
+             // Close dropdown just in case
+            const dropdown = document.getElementById('profile-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            
             await authStore.logout();
             router.navigate('/login');
         });
+    }
+
+    // Toggle Dropdown
+    const trigger = document.getElementById('profile-trigger');
+    const dropdown = document.getElementById('profile-dropdown');
+
+    if (trigger && dropdown) {
+        // Toggle on click
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close on click outside
+        // We need a named function to remove it later if we wanted to be perfectly clean,
+        // but for this simple app, a persistent document listener is acceptable/common trade-off
+        // provided we check if element exists or we accept it runs always.
+        // Actually, since this setupHeaderEvents is called multiple times (re-render),
+        // adding document listener repeatedly is BAD. It will stack up.
+        
+        // Solution: Remove old listener if exists? Hard to reference.
+        // Better: Use a global handler or check if listener already attached?
+        // Or specific logic.
+        
+        // Let's use a simpler approach: 
+        // We can attach `onclick` property to document.body, but that overrides others.
+        // Best for SPA needing cleanup: Attach event listener that checks if trigger/dropdown exists.
+        // If they don't exist (because Header removed), it does nothing.
+        
+        // Even better: MainLayout re-renders Header. 
+        // Let's just create the handler and attach it. 
+        // To avoid duplicates, we can attach to `app` or remove previous.
+        // BUT, since we cannot easily remove anonymous functions or previous references here:
+        // Let's check if we already initialized? No state here.
+        
+        // Alternative: Use a 'once' listener on document that re-attaches? No.
+        // Let's rely on the fact that click outside is global.
+        
+        const closeDropdown = (e) => {
+             if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+                 dropdown.classList.add('hidden');
+             }
+        };
+        
+        // Remove existing to prevent duplicates if MainLayout calls this often
+        // (Note: this only works if function reference is same. It is NOT same here)
+        // Correct fix: Store controller or use unique event name if possible. 
+        // Or just `trigger.onclick` which handles the open.
+        // For close, we need document level.
+        
+        // WORKAROUND for re-attachment: Use a custom property on document to store the handler?
+        if (document._headerClickOutside) {
+            document.removeEventListener('click', document._headerClickOutside);
+        }
+        document._headerClickOutside = closeDropdown;
+        document.addEventListener('click', closeDropdown);
     }
 };

@@ -287,7 +287,7 @@
 
     </div>
   `},D=()=>{const e=document.getElementById("player-play"),t=document.getElementById("player-next"),r=document.getElementById("player-prev"),s=document.getElementById("player-toggle-video");e&&(e.onclick=()=>P.togglePlay()),t&&(t.onclick=()=>P.next()),r&&(r.onclick=()=>P.prev()),s&&(s.onclick=()=>{const n=document.getElementById("yt-player-container");n&&(n.classList.toggle("hidden-video"),s.classList.toggle("text-white"),s.classList.toggle("text-yt-text-secondary"))})},T=(e,t)=>{const r=document.getElementById("app");(()=>{r.innerHTML=`
-        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative">
+        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative gap-16">
             <div class="aurora-bg"></div>
             
             <!-- Sidebar is now a flex item, not fixed -->

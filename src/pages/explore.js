@@ -78,7 +78,7 @@ const renderCard = (item) => {
     const subtitle = Array.isArray(item.artists) 
         ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
         : '';
-    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.image || 'https://via.placeholder.com/300';
+    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.thumb || item.image || 'https://via.placeholder.com/300';
     
     return `
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

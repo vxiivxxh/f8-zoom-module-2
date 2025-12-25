@@ -123,7 +123,7 @@ export const renderRegister = (router) => {
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Đang đăng ký...';
+    submitBtn.textContent = 'Đang đăng ký & đăng nhập...';
 
     // Note: register args depend on authStore implementation. 
     // We updated authStore to match: register(name, email, password, confirmPassword)
@@ -134,7 +134,7 @@ export const renderRegister = (router) => {
       // User requirements didn't specify, but UX usually prefers auto-login or redirect to login.
       // Let's redirect to login for clarity as authStore.register doesn't auto-set token usually unless API returns it.
       // Actually checking authStore.js I wrote earlier: it DOES NOT set token on register. So redirect to login.
-      router.navigate('/login');
+      router.navigate('/');
     } else {
       errorDiv.textContent = result.error || 'Đăng ký thất bại.';
       errorDiv.classList.remove('hidden');

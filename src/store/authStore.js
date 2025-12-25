@@ -72,16 +72,37 @@ class AuthStore {
   async register(name, email, password, confirmPassword) {
     this.setState({ isLoading: true });
     try {
-      await apiClient.post('/auth/register', { 
+      const response = await apiClient.post('/auth/register', { 
         name, 
         email, 
         password,
         confirmPassword 
       });
-      // Auto-login or redirect to login page depending on requirements
-      // Implementation Plan says redirect to Login or Home. 
-      // Let's assume registration just creates account for now.
-      this.setState({ isLoading: false });
+      
+      // Auto-login: API returns tokens and user
+      const { access_token, refresh_token, user } = response.data || response;
+      const accessToken = access_token;
+      const refreshToken = refresh_token;
+
+      if (accessToken) {
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          
+          // Set user state directly if returned, or fetch it
+          if (user) {
+              this.setState({ 
+                user: user, 
+                isAuthenticated: true, 
+                isLoading: false 
+              });
+          } else {
+              await this.fetchCurrentUser();
+          }
+      } else {
+          // If no token, just stop loading (shouldn't happen with current API)
+          this.setState({ isLoading: false });
+      }
+
       return { success: true };
     } catch (error) {
       this.setState({ isLoading: false });

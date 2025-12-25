@@ -17,9 +17,12 @@ export const renderHome = async (router) => {
        apiClient.get('/home/todays-hits')
     ]);
 
-    const albums = albumsRes.data || [];
-    const hits = hitsRes.data || [];
-    
+    // Parse data: response.data.data (standard) or response.data (if client helper didn't unwrap enough)
+    // The previous implementation assumed response.data directly which might be incorrect based on API tests.
+    // Let's robustly check.
+    const albums = albumsRes.data?.data || albumsRes.data || [];
+    const hits = hitsRes.data?.data || hitsRes.data || [];
+
     // User personalization
     const user = authStore.user;
     const greeting = user ? `Xin chào, ${user.name}` : 'Xin chào';
@@ -39,7 +42,7 @@ export const renderHome = async (router) => {
              <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${albums.slice(0, 6).map(album => renderCard(album)).join('')}
+             ${Array.isArray(albums) ? albums.slice(0, 6).map(album => renderCard(album)).join('') : ''}
           </div>
         </section>
 
@@ -50,7 +53,7 @@ export const renderHome = async (router) => {
              <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${hits.slice(0, 6).map(hit => renderCard(hit)).join('')}
+             ${Array.isArray(hits) ? hits.slice(0, 6).map(hit => renderCard(hit)).join('') : ''}
           </div>
         </section>
       </div>
@@ -92,12 +95,29 @@ export const renderHome = async (router) => {
 const renderCard = (item) => {
     // Handle different API structures. Assuming item has title, description, thumbnail
     const title = item.title || item.name || 'Không có tiêu đề';
-    const subtitle = item.artists ? item.artists.map(a => a.name).join(', ') : (item.description || '');
-    const image = item.thumbnail || item.image || 'https://via.placeholder.com/300';
     
-    // Encode item data for passing to onclick (Not elegant but works for Vanilla string template)
-    // Better: Attach event listeners after render.
-    // For now, let's stick to global or event delegation.
+    // Robust artist handling (string or array)
+    let subtitle = '';
+    if (Array.isArray(item.artists)) {
+        subtitle = item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ');
+    } else if (typeof item.artists === 'string') {
+        subtitle = item.artists;
+    } else {
+        subtitle = item.description || '';
+    }
+
+    // Thumbnail handling
+    let image = 'https://via.placeholder.com/300';
+    if (item.thumbnail) {
+        if (typeof item.thumbnail === 'string') image = item.thumbnail;
+        else if (Array.isArray(item.thumbnail) && item.thumbnail.length > 0) image = item.thumbnail[0].url || item.thumbnail[0];
+        else if (item.thumbnail.url) image = item.thumbnail.url;
+    } else if (item.thumbnails) { 
+        // Some endpoints return 'thumbnails' array
+         if (Array.isArray(item.thumbnails) && item.thumbnails.length > 0) image = item.thumbnails[0].url || item.thumbnails[0];
+    } else if (item.image) {
+        image = item.image;
+    }
     
     return `
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

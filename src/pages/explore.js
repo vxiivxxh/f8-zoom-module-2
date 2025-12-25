@@ -11,12 +11,11 @@ export const renderExplore = async (router) => {
   try {
      const [newReleasesRes] = await Promise.all([
         apiClient.get('/explore/new-releases'),
-        // Add more calls like Moods/Genres later
      ]);
 
-     const newReleases = newReleasesRes.data || [];
+     // Parse data: Ensure we access .data based on wrapper
+     const newReleases = newReleasesRes.data?.data || newReleasesRes.data || [];
 
-     // Mock chips for Moods since API might not include them directly yet
      const chips = ['Mới phát hành', 'Bảng xếp hạng', 'Tâm trạng', 'Pop', 'Rock', 'Hiphop v.v.'];
 
      const content = `
@@ -34,7 +33,7 @@ export const renderExplore = async (router) => {
          <section>
             <h2 class="text-2xl font-bold mb-4">Mới phát hành</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${newReleases.slice(0, 10).map(item => renderCard(item)).join('')}
+               ${Array.isArray(newReleases) ? newReleases.slice(0, 10).map(item => renderCard(item)).join('') : '<p>Không có dữ liệu</p>'}
             </div>
          </section>
        </div>
@@ -74,8 +73,28 @@ export const renderExplore = async (router) => {
 // Reused simple card (Should be a shared component in real app)
 const renderCard = (item) => {
     const title = item.title || item.name || 'No Title';
-    const subtitle = item.artists ? item.artists.map(a => a.name).join(', ') : '';
-    const image = item.thumbnail || item.image || 'https://via.placeholder.com/300';
+    
+    // Robust artist handling
+    let subtitle = '';
+    if (Array.isArray(item.artists)) {
+        subtitle = item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ');
+    } else if (typeof item.artists === 'string') {
+        subtitle = item.artists;
+    } else {
+        subtitle = item.description || '';
+    }
+
+    // Thumbnail handling
+    let image = 'https://via.placeholder.com/300';
+    if (item.thumbnail) {
+        if (typeof item.thumbnail === 'string') image = item.thumbnail;
+        else if (Array.isArray(item.thumbnail) && item.thumbnail.length > 0) image = item.thumbnail[0].url || item.thumbnail[0];
+        else if (item.thumbnail.url) image = item.thumbnail.url;
+    } else if (item.thumbnails) { 
+         if (Array.isArray(item.thumbnails) && item.thumbnails.length > 0) image = item.thumbnails[0].url || item.thumbnails[0];
+    } else if (item.image) {
+        image = item.image;
+    }
     
     return `
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

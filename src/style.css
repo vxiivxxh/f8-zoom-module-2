@@ -103,3 +103,4 @@ body.sidebar-collapsed aside>div:first-child {
 body.sidebar-collapsed .hide-on-collapse {
     display: none !important;
 }
+/* Logo cropping rules removed to keep text visible */

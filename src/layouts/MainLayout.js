@@ -10,7 +10,7 @@ export const MainLayout = (content, router) => {
   
   const render = () => {
     app.innerHTML = `
-        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative">
+        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative gap-16">
             <div class="aurora-bg"></div>
             
             <!-- Sidebar is now a flex item, not fixed -->

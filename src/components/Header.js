@@ -6,7 +6,7 @@ export const Header = () => {
   const initial = user && user.name ? user.name.charAt(0).toUpperCase() : 'G';
 
   return `
-    <header class="fixed top-0 left-0 right-0 h-header bg-yt-base/95 backdrop-blur-sm z-header flex items-center justify-between px-4 border-b border-gray-800">
+    <header class="fixed top-0 left-0 right-0 h-header bg-transparent z-header flex items-center justify-between px-4">
       
       <!-- Left: Hamburger & Logo -->
       <div class="flex items-center gap-4">

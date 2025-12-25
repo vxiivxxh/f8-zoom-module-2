@@ -41,7 +41,7 @@ export const renderHome = async (router) => {
 
         <!-- Section: Moods / Categories -->
         ${moods.length > 0 ? `
-        <div class="flex overflow-x-auto gap-3 pb-2 scrollbar-none -mx-8 px-8 mb-8 sticky top-16 z-30 bg-black/50 backdrop-blur-md py-2 transition-all">
+        <div class="flex overflow-x-auto gap-3 pb-2 scrollbar-none -mx-8 px-8 mb-8 bg-transparent py-2 transition-all">
             ${moods.map(mood => `
                 <a href="${import.meta.env.BASE_URL}explore?category=${mood.slug}" class="inline-flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors whitespace-nowrap border border-white/5" data-navigo>
                     ${mood.name}

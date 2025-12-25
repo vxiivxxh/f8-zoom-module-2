@@ -6,7 +6,7 @@ import { renderRegister } from './pages/register';
 import { renderHome } from './pages/home';
 import { renderExplore } from './pages/explore';
 
-const router = new Navigo('/');
+const router = new Navigo(import.meta.env.BASE_URL || '/');
 
 // Route Definitions
 router

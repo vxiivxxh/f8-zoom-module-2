@@ -72,7 +72,7 @@ export const renderRegister = (router) => {
 
         <div class="mt-6 text-center text-sm text-yt-text-secondary">
           Đã có tài khoản? 
-          <a href="/login" class="text-blue-400 hover:text-blue-300 transition-colors" data-navigo>Đăng nhập</a>
+          <a href="${import.meta.env.BASE_URL}login" class="text-blue-400 hover:text-blue-300 transition-colors" data-navigo>Đăng nhập</a>
         </div>
       </div>
     </div>

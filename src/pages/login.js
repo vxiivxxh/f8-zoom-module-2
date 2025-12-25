@@ -48,7 +48,7 @@ export const renderLogin = (router) => {
 
         <div class="mt-6 text-center text-sm text-yt-text-secondary">
           Chưa có tài khoản? 
-          <a href="/register" class="text-blue-400 hover:text-blue-300 transition-colors" data-navigo>Tạo tài khoản</a>
+          <a href="${import.meta.env.BASE_URL}register" class="text-blue-400 hover:text-blue-300 transition-colors" data-navigo>Tạo tài khoản</a>
         </div>
       </div>
     </div>

@@ -13,16 +13,19 @@ export const renderHome = async (router) => {
 
   try {
     // Parallel data fetching
-    const [albumsRes, hitsRes, quickPicksRes] = await Promise.all([
+    const [albumsRes, hitsRes, quickPicksRes, moodsRes] = await Promise.all([
        apiClient.get('/home/albums-for-you'),
        apiClient.get('/home/todays-hits'),
-       apiClient.get('/quick-picks')
+       apiClient.get('/quick-picks'),
+       apiClient.get('/moods')
     ]);
 
     // API returns array directly for these endpoints
     const albums = Array.isArray(albumsRes) ? albumsRes : (albumsRes.data || []);
     const hits = Array.isArray(hitsRes) ? hitsRes : (hitsRes.data || []);
     const quickPicks = Array.isArray(quickPicksRes) ? quickPicksRes : (quickPicksRes.data || []);
+    // Fix: Access .items directly from response object
+    const moods = (moodsRes && moodsRes.items) ? moodsRes.items : (Array.isArray(moodsRes) ? moodsRes : []);
     
     // User personalization
     const user = authStore.user;
@@ -31,56 +34,39 @@ export const renderHome = async (router) => {
     const content = `
       <div class="space-y-10">
         <!-- Section: Welcome / Quick actions -->
-        <div>
+        <div class="mb-6">
            <h1 class="text-3xl font-bold mb-2">${greeting}</h1>
            ${!user ? '<p class="text-yt-text-secondary">Đăng nhập để xem lịch sử nghe nhạc và đề xuất riêng cho bạn.</p>' : ''}
         </div>
 
-        <!-- Section: Quick Picks -->
-        ${quickPicks.length > 0 ? `
-        <section>
-          <div class="flex items-center justify-between mb-4">
-             <div>
-                <p class="text-sm font-medium text-yt-text-secondary uppercase tracking-wider">Bắt đầu nhanh</p>
-                <h2 class="text-2xl font-bold">Gợi ý nhanh</h2>
-             </div>
-             <!-- Optional Play All button or similar -->
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${quickPicks.slice(0, 6).map(item => renderCard(item)).join('')}
-          </div>
-        </section>
+        <!-- Section: Moods / Categories -->
+        ${moods.length > 0 ? `
+        <div class="flex overflow-x-auto gap-3 pb-2 scrollbar-none -mx-8 px-8 mb-8 sticky top-16 z-30 bg-black/50 backdrop-blur-md py-2 transition-all">
+            ${moods.map(mood => `
+                <a href="${import.meta.env.BASE_URL}explore?category=${mood.slug}" class="inline-flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors whitespace-nowrap border border-white/5" data-navigo>
+                    ${mood.name}
+                </a>
+            `).join('')}
+        </div>
         ` : ''}
 
+        <!-- Section: Quick Picks -->
+        ${quickPicks.length > 0 ? renderSection('Gợi ý nhanh', quickPicks, 'quick-picks', 'Bắt đầu nhanh') : ''}
+
         <!-- Section 1: Albums for you -->
-        <section>
-          <div class="flex items-center justify-between mb-4">
-             <h2 class="text-2xl font-bold">Gợi ý Album</h2>
-             <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${albums.slice(0, 6).map(album => renderCard(album)).join('')}
-          </div>
-        </section>
+        ${renderSection('Gợi ý Album', albums, 'albums')}
 
         <!-- Section 2: Today's Hits -->
-        <section>
-          <div class="flex items-center justify-between mb-4">
-             <h2 class="text-2xl font-bold">Hit Hôm Nay</h2>
-             <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${hits.slice(0, 6).map(hit => renderCard(hit)).join('')}
-          </div>
-        </section>
+        ${renderSection('Hit Hôm Nay', hits, 'hits')}
       </div>
     `;
 
      MainLayout(content, router);
 
-     // Event Delegation for Song Cards
+     // Event Delegation for Song Cards & Scroll Buttons
      const main = document.querySelector('main');
      if (main) {
+         // Handle Card Clicks
          main.addEventListener('click', (e) => {
              const card = e.target.closest('.song-card');
              if (card) {
@@ -93,6 +79,25 @@ export const renderHome = async (router) => {
                      console.error('Failed to play song', err);
                  }
              }
+         });
+
+         // Handle Scroll Buttons
+         const scrollBtns = main.querySelectorAll('[data-scroll]');
+         scrollBtns.forEach(btn => {
+             btn.addEventListener('click', (e) => {
+                 const direction = e.currentTarget.dataset.scroll; // 'left' or 'right'
+                 const targetId = e.currentTarget.dataset.target;
+                 const container = document.getElementById(targetId);
+                 
+                 if (container) {
+                     const scrollAmount = container.clientWidth * 0.75;
+                     if (direction === 'left') {
+                         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                     } else {
+                         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                     }
+                 }
+             });
          });
      }
 
@@ -108,28 +113,48 @@ export const renderHome = async (router) => {
   }
 };
 
+// Helper: Render Section with Slider
+const renderSection = (title, items, id, subtitle = '') => {
+    if (!items || items.length === 0) return '';
+    return `
+    <section>
+        <div class="flex items-end justify-between mb-4">
+            <div>
+                ${subtitle ? `<p class="text-sm font-medium text-yt-text-secondary uppercase tracking-wider mb-1">${subtitle}</p>` : ''}
+                <h2 class="text-2xl font-bold leading-tight">${title}</h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white" 
+                    data-scroll="left" data-target="${id}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors text-white" 
+                    data-scroll="right" data-target="${id}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 -mr-8 pr-8">
+            ${items.map(item => renderCard(item)).join('')}
+        </div>
+    </section>
+    `;
+};
+
 // Helper: Card Component
 const renderCard = (item) => {
-    // Handle different API structures. Assuming item has title, description, thumbnail
     const rawTitle = item.title || item.name || 'Không có tiêu đề';
     const title = escapeHTML(rawTitle);
 
-    // API returns artists as string array, or object array depending on endpoint. Handle both.
     const rawSubtitle = Array.isArray(item.artists) 
         ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
         : (item.description || '');
     const subtitle = escapeHTML(rawSubtitle);
         
-    // API returns thumbnails as array
     const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.image || 'https://via.placeholder.com/300';
     
-    // Encode item data for passing to onclick (Not elegant but works for Vanilla string template)
-    // We also need to be careful with JSON.stringify inside HTML attribute but single quotes helps.
-    // Ideally we should assign data via property, but this pattern is used throughout the plan.
-    // escaping quotes in the JSON string is crucial for the data-song attribute.
-    
     return `
-      <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
+      <div class="flex-shrink-0 w-48 group cursor-pointer song-card snap-start" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
          <div class="relative aspect-square mb-3 rounded overflow-hidden bg-gray-800">
             <img src="${image}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

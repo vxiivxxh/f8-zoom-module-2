@@ -31,5 +31,9 @@ dist-ssr
 # OS
 Thumbs.db
 .vercel
-.env*.local
+.env*.l
+# Documentation
 docs/
+
+# Scripts
+scripts/

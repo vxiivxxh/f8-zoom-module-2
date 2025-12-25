@@ -6,7 +6,7 @@ export const Player = () => {
   if (!currentSong) return ''; // Or render empty state
 
   const title = currentSong.title || currentSong.name || 'Unknown Title';
-  const artist = currentSong.artists ? currentSong.artists.map(a => a.name).join(', ') : 'Unknown Artist';
+  const artist = currentSong.artists ? ((typeof currentSong.artists === 'string') ? currentSong.artists : currentSong.artists.map(a => a.name).join(', ')) : 'Unknown Artist';
   const image = currentSong.thumbnail || currentSong.image || 'https://via.placeholder.com/60';
 
   return `
@@ -51,6 +51,11 @@ export const Player = () => {
 
       <!-- Right: Volume/Extra -->
       <div class="flex items-center justify-end w-1/4 min-w-[180px] gap-3">
+         <!-- Toggle Video Button -->
+         <button id="player-toggle-video" class="text-yt-text-secondary hover:text-white" title="Toggle Video">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7z"/></svg>
+         </button>
+         
          <button class="text-yt-text-secondary hover:text-white">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
          </button>
@@ -66,8 +71,21 @@ export const setupPlayerEvents = () => {
     const playBtn = document.getElementById('player-play');
     const nextBtn = document.getElementById('player-next');
     const prevBtn = document.getElementById('player-prev');
+    const videoBtn = document.getElementById('player-toggle-video');
 
     if (playBtn) playBtn.onclick = () => playerStore.togglePlay();
     if (nextBtn) nextBtn.onclick = () => playerStore.next();
     if (prevBtn) prevBtn.onclick = () => playerStore.prev();
+    
+    if (videoBtn) {
+        videoBtn.onclick = () => {
+            const container = document.getElementById('yt-player-container');
+            if (container) {
+                container.classList.toggle('hidden-video');
+                // Optional: Update button style to show active state
+                videoBtn.classList.toggle('text-white');
+                videoBtn.classList.toggle('text-yt-text-secondary');
+            }
+        };
+    }
 };

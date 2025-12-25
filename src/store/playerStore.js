@@ -23,11 +23,11 @@ class PlayerStore {
 
      window.onYouTubeIframeAPIReady = () => {
         this.player = new window.YT.Player('yt-player-container', {
-           height: '0',
-           width: '0',
+           height: '360', // Visible height
+           width: '640', // Visible width
            playerVars: {
               'autoplay': 1,
-              'controls': 0,
+              'controls': 0, // Custom controls
               'disablekb': 1,
               'fs': 0,
               'iv_load_policy': 3,
@@ -57,14 +57,34 @@ class PlayerStore {
         });
      };
      
-     // Create a hidden container for the player if it doesn't exist
+     // Create a container for the player if it doesn't exist
+     // Modified to be visible but absolutely positioned or toggleable
      if (!document.getElementById('yt-player-container')) {
          const div = document.createElement('div');
          div.id = 'yt-player-container';
-         div.style.position = 'absolute';
-         div.style.top = '-9999px';
-         div.style.left = '-9999px';
+         // Initial state: Hidden/Small or Fixed somewhere? 
+         // Implementation: Fixed bottom right above player bar, toggleable.
+         div.style.position = 'fixed';
+         div.style.bottom = '90px'; // Above player bar
+         div.style.right = '20px';
+         div.style.zIndex = '1000';
+         div.style.borderRadius = '8px';
+         div.style.overflow = 'hidden';
+         // div.style.display = 'none'; // Initially hidden
+         div.className = 'youtube-player shadow-2xl transition-all duration-300 hidden-video'; 
+         // Add class for easy toggling
          document.body.appendChild(div);
+         
+         // Add styles for class if not in CSS
+         const style = document.createElement('style');
+         style.innerHTML = `
+            .hidden-video {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(20px);
+            }
+         `;
+         document.head.appendChild(style);
      }
   }
 

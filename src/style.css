@@ -41,3 +41,50 @@ body {
         /* Chrome, Safari and Opera */
     }
 }
+/* Sidebar Collapsed State Overrides */
+body.sidebar-collapsed aside {
+    width: 72px;
+}
+
+body.sidebar-collapsed .pl-sidebar {
+    padding-left: 72px;
+}
+
+body.sidebar-collapsed .left-sidebar {
+    left: 72px;
+}
+
+/* Hide text labels in collapsed sidebar normally, but we want them visible and small below icon */
+body.sidebar-collapsed aside nav a span {
+    display: block;
+    font-size: 10px;
+    margin-top: 4px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Center icons in collapsed sidebar and stack vertically */
+body.sidebar-collapsed aside nav a {
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 0;
+}
+
+/* Adjust SVG size or margin if needed */
+body.sidebar-collapsed aside nav a svg {
+    margin-bottom: 2px;
+    width: 24px;
+    height: 24px;
+}
+
+/* Hide logo text/extra items if any in header of sidebar */
+/* Adjust logo container centering */
+body.sidebar-collapsed aside>div:first-child {
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+}

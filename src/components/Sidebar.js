@@ -1,12 +1,8 @@
+
+
 export const Sidebar = () => {
   return `
-    <aside class="fixed top-0 left-0 w-sidebar h-full bg-yt-sidebar text-yt-text-secondary flex flex-col pt-4 z-sidebar border-r border-gray-800">
-      <div class="px-6 mb-6 flex items-center gap-1 cursor-pointer" onclick="window.history.pushState({}, '', '${import.meta.env.BASE_URL}'); window.dispatchEvent(new PopStateEvent('popstate'));">
-        <div class="flex items-center justify-center p-2">
-           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
-        </div>
-      </div>
-
+    <aside class="fixed top-header left-0 w-sidebar bottom-0 bg-yt-sidebar text-yt-text-secondary flex flex-col pt-4 z-sidebar border-r border-gray-800 transition-all duration-300">
       <nav class="flex-1 px-4 space-y-2">
         <a href="${import.meta.env.BASE_URL}" class="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-yt-hover hover:text-yt-text-primary transition-colors data-navigo" data-navigo>
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -32,3 +28,5 @@ export const Sidebar = () => {
     </aside>
   `;
 };
+
+// End of Sidebar component

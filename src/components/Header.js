@@ -1,14 +1,25 @@
 import { authStore } from '../store/authStore';
+import { uiStore } from '../store/uiStore';
 
 export const Header = () => {
   const user = authStore.user;
   const initial = user && user.name ? user.name.charAt(0).toUpperCase() : 'G';
 
   return `
-    <header class="fixed top-0 left-sidebar right-0 h-header bg-yt-base/95 backdrop-blur-sm z-header flex items-center justify-between px-6 border-b border-gray-800">
+    <header class="fixed top-0 left-0 right-0 h-header bg-yt-base/95 backdrop-blur-sm z-header flex items-center justify-between px-4 border-b border-gray-800">
       
-      <!-- Search Bar -->
-      <div class="flex items-center flex-1 max-w-xl">
+      <!-- Left: Hamburger & Logo -->
+      <div class="flex items-center gap-4">
+        <button id="sidebar-toggle" class="p-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <a href="${import.meta.env.BASE_URL}" class="flex items-center justify-center p-2 logo-container" data-navigo>
+           <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" class="h-6">
+        </a>
+      </div>
+
+      <!-- Center: Search Bar -->
+      <div class="flex items-center flex-1 max-w-xl ml-10">
         <div class="relative w-full">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-yt-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -53,6 +64,14 @@ export const Header = () => {
 
 // Bind events after rendering
 export const setupHeaderEvents = (router) => {
+    // Sidebar Toggle
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            uiStore.toggleSidebar();
+        });
+    }
+
     const logoutBtn = document.getElementById('header-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {

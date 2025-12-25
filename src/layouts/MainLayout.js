@@ -1,7 +1,9 @@
+
 import { Sidebar } from '../components/Sidebar';
 import { Header, setupHeaderEvents } from '../components/Header';
 import { Player, setupPlayerEvents } from '../components/Player';
 import { playerStore } from '../store/playerStore';
+import { authStore } from '../store/authStore';
 
 export const MainLayout = (content, router) => {
   const app = document.getElementById('app');
@@ -69,9 +71,16 @@ export const MainLayout = (content, router) => {
           setupPlayerEvents();
       }
   });
-  
-  // Cleanup subscription when layout changes? 
-  // Vanilla JS routing makes cleanup hard without a lifecycle.
-  // We'll accept a small leak or duplicate listener for this simple architecture 
-  // OR attach unsub to a global object if needed.
+
+  const authUnsub = authStore.subscribe((state) => {
+      // Re-render Header
+      const headerContainer = document.querySelector('header');
+      if (headerContainer) {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = Header();
+          const newHeader = tempDiv.firstElementChild;
+          headerContainer.replaceWith(newHeader);
+          setupHeaderEvents(router);
+      }
+  });
 };

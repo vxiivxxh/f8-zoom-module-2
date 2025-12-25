@@ -125,8 +125,11 @@ class AuthStore {
   async fetchCurrentUser() {
     try {
       const response = await apiClient.get('/auth/me');
+      // Fix: apiClient returns data directly. If response is the user object, use it.
+      // If response has .data property, use that (handled by || response check roughly, but safeguards needed)
+      const userData = response.data || response;
       this.setState({ 
-        user: response.data, 
+        user: userData, 
         isAuthenticated: true, 
         isLoading: false 
       });

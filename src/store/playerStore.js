@@ -23,11 +23,11 @@ class PlayerStore {
 
      window.onYouTubeIframeAPIReady = () => {
         this.player = new window.YT.Player('yt-player-container', {
-           height: '360', // Visible height
-           width: '640', // Visible width
+           height: '180',
+           width: '320',
            playerVars: {
               'autoplay': 1,
-              'controls': 0, // Custom controls
+              'controls': 0,
               'disablekb': 1,
               'fs': 0,
               'iv_load_policy': 3,
@@ -57,34 +57,13 @@ class PlayerStore {
         });
      };
      
-     // Create a container for the player if it doesn't exist
-     // Modified to be visible but absolutely positioned or toggleable
+     // Create a hidden container for the player if it doesn't exist
      if (!document.getElementById('yt-player-container')) {
          const div = document.createElement('div');
          div.id = 'yt-player-container';
-         // Initial state: Hidden/Small or Fixed somewhere? 
-         // Implementation: Fixed bottom right above player bar, toggleable.
-         div.style.position = 'fixed';
-         div.style.bottom = '90px'; // Above player bar
-         div.style.right = '20px';
-         div.style.zIndex = '1000';
-         div.style.borderRadius = '8px';
-         div.style.overflow = 'hidden';
-         // div.style.display = 'none'; // Initially hidden
-         div.className = 'youtube-player shadow-2xl transition-all duration-300 hidden-video'; 
-         // Add class for easy toggling
+         // Default to hidden class, managed by CSS
+         div.className = 'yt-video-container hidden-video';
          document.body.appendChild(div);
-         
-         // Add styles for class if not in CSS
-         const style = document.createElement('style');
-         style.innerHTML = `
-            .hidden-video {
-                opacity: 0;
-                pointer-events: none;
-                transform: translateY(20px);
-            }
-         `;
-         document.head.appendChild(style);
      }
   }
 
@@ -121,18 +100,8 @@ class PlayerStore {
 
   // Actions
   play(song) {
-    // Normalizing ID: API might return 'encodeId' or 'id'.
-    // Youtube Iframe needs video ID.
-    // If encodeId is present, we assume it serves as the YT ID for this clone.
-    const songId = song.encodeId || song.id;
-
-    if (!songId) {
-        console.error("Cannot play song without ID:", song);
-        return;
-    }
-
     // If playing the same song, just resume
-    if (this.state.currentSong && (this.state.currentSong.encodeId === songId || this.state.currentSong.id === songId)) {
+    if (this.state.currentSong && this.state.currentSong.id === song.id) {
        if (this.player && typeof this.player.playVideo === 'function') {
            this.player.playVideo();
        }
@@ -149,7 +118,12 @@ class PlayerStore {
     });
     
     if (this.player && typeof this.player.loadVideoById === 'function') {
-        this.player.loadVideoById(songId);
+        // Assuming 'link' or 'encodeId' can be used to find proper video ID.
+        // YouTube Music clones usually map encodeId to a Video ID via another API or use the ID directly if available.
+        // For this task, let's assume `encodeId` IS the video ID or we have `videoId` prop.
+        // Looking at common APIs, it might be `encodeId`.
+        const videoId = song.id; 
+        this.player.loadVideoById(videoId);
     }
 
     // Queue logic
@@ -157,7 +131,7 @@ class PlayerStore {
         this.state.queue = [song];
         this.state.currentIndex = 0;
     } else {
-        const index = this.state.queue.findIndex(s => (s.encodeId === songId || s.id === songId));
+        const index = this.state.queue.findIndex(s => s.id === song.id);
         if (index === -1) {
              this.state.queue.push(song);
              this.setState({ currentIndex: this.state.queue.length - 1});

@@ -18,11 +18,11 @@ export const renderHome = async (router) => {
        apiClient.get('/quick-picks')
     ]);
 
-    // Parse data safely
-    const albums = albumsRes.data?.data || albumsRes.data || [];
-    const hits = hitsRes.data?.data || hitsRes.data || [];
-    const quickPicks = quickPicksRes.data?.data || quickPicksRes.data || [];
-
+    // API returns array directly for these endpoints
+    const albums = Array.isArray(albumsRes) ? albumsRes : (albumsRes.data || []);
+    const hits = Array.isArray(hitsRes) ? hitsRes : (hitsRes.data || []);
+    const quickPicks = Array.isArray(quickPicksRes) ? quickPicksRes : (quickPicksRes.data || []);
+    
     // User personalization
     const user = authStore.user;
     const greeting = user ? `Xin chào, ${user.name}` : 'Xin chào';
@@ -35,22 +35,21 @@ export const renderHome = async (router) => {
            ${!user ? '<p class="text-yt-text-secondary">Đăng nhập để xem lịch sử nghe nhạc và đề xuất riêng cho bạn.</p>' : ''}
         </div>
 
-        <!-- Section 0: Quick Picks (Mock or Real) -->
+        <!-- Section: Quick Picks -->
+        ${quickPicks.length > 0 ? `
         <section>
           <div class="flex items-center justify-between mb-4">
              <div>
-                <span class="text-yt-text-secondary uppercase tracking-widest text-xs font-bold">Bắt đầu nhanh</span>
-                <h2 class="text-2xl font-bold">Tuyển tập nhanh</h2>
+                <p class="text-sm font-medium text-yt-text-secondary uppercase tracking-wider">Bắt đầu nhanh</p>
+                <h2 class="text-2xl font-bold">Gợi ý nhanh</h2>
              </div>
-             <!-- <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Phát tất cả</button> -->
+             <!-- Optional Play All button or similar -->
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-             ${Array.isArray(quickPicks) && quickPicks.length > 0 
-                ? quickPicks.slice(0, 5).map(item => renderCard(item)).join('')
-                : '<p class="col-span-full text-yt-text-secondary">Chưa có tuyển tập nhanh nào.</p>'
-             }
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+             ${quickPicks.slice(0, 6).map(item => renderCard(item)).join('')}
           </div>
         </section>
+        ` : ''}
 
         <!-- Section 1: Albums for you -->
         <section>
@@ -59,7 +58,7 @@ export const renderHome = async (router) => {
              <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${Array.isArray(albums) ? albums.slice(0, 6).map(album => renderCard(album)).join('') : ''}
+             ${albums.slice(0, 6).map(album => renderCard(album)).join('')}
           </div>
         </section>
 
@@ -70,7 +69,7 @@ export const renderHome = async (router) => {
              <button class="text-sm font-medium text-yt-text-secondary hover:text-white uppercase tracking-wider">Xem thêm</button>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-             ${Array.isArray(hits) ? hits.slice(0, 6).map(hit => renderCard(hit)).join('') : ''}
+             ${hits.slice(0, 6).map(hit => renderCard(hit)).join('')}
           </div>
         </section>
       </div>
@@ -112,29 +111,17 @@ export const renderHome = async (router) => {
 const renderCard = (item) => {
     // Handle different API structures. Assuming item has title, description, thumbnail
     const title = item.title || item.name || 'Không có tiêu đề';
+    // API returns artists as string array, or object array depending on endpoint. Handle both.
+    const subtitle = Array.isArray(item.artists) 
+        ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
+        : (item.description || '');
+        
+    // API returns thumbnails as array
+    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.image || 'https://via.placeholder.com/300';
     
-    // Robust artist handling (string or array)
-    let subtitle = '';
-    if (Array.isArray(item.artists)) {
-        subtitle = item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ');
-    } else if (typeof item.artists === 'string') {
-        subtitle = item.artists;
-    } else {
-        subtitle = item.description || '';
-    }
-
-    // Thumbnail handling
-    let image = 'https://via.placeholder.com/300';
-    if (item.thumbnail) {
-        if (typeof item.thumbnail === 'string') image = item.thumbnail;
-        else if (Array.isArray(item.thumbnail) && item.thumbnail.length > 0) image = item.thumbnail[0].url || item.thumbnail[0];
-        else if (item.thumbnail.url) image = item.thumbnail.url;
-    } else if (item.thumbnails) { 
-        // Some endpoints return 'thumbnails' array
-         if (Array.isArray(item.thumbnails) && item.thumbnails.length > 0) image = item.thumbnails[0].url || item.thumbnails[0];
-    } else if (item.image) {
-        image = item.image;
-    }
+    // Encode item data for passing to onclick (Not elegant but works for Vanilla string template)
+    // Better: Attach event listeners after render.
+    // For now, let's stick to global or event delegation.
     
     return `
       <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

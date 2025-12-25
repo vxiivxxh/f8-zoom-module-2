@@ -1,59 +1,43 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  --color-yt-black: #030303;
-  --color-yt-gray: #0f0f0f;
-  --color-yt-light-gray: #212121;
-  --color-yt-text-primary: #f1f1f1;
-  --color-yt-text-secondary: #aaaaaa;
-  --color-yt-red: #ff0000;
-}
-
-:root {
-  font-family: Roboto, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: dark;
-  color: var(--color-yt-text-primary);
-  background-color: var(--color-yt-black);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* Additional styles can be added here */
 body {
-  margin: 0;
-  display: flex;
-  min-width: 320px;
-  min-height: 100vh;
-  overflow: hidden; /* App-like feel, manage scroll in sub-containers */
+    @apply bg-yt-base text-yt-text-primary font-sans overflow-hidden;
 }
 
 #app {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+    @apply h-screen w-screen flex flex-col;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Video Player Styles */
+.yt-video-container {
+    @apply fixed bottom-24 right-4 z-50 rounded-lg overflow-hidden shadow-2xl transition-all duration-300;
+    pointer-events: none;
+    /* Let clicks pass through if just viewing, or enable if controls needed */
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.yt-video-container.hidden-video {
+    @apply opacity-0 pointer-events-none translate-y-10;
+    visibility: hidden;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #606060;
-  border-radius: 4px;
+.yt-video-container:not(.hidden-video) {
+    @apply opacity-100 translate-y-0;
+    visibility: visible;
+    pointer-events: auto;
 }
+@layer utilities {
+    .scrollbar-none {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #909090;
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
 }

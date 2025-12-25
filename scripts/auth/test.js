@@ -32,6 +32,12 @@ export async function runAuthTests() {
     
     if (regRes.ok) {
          console.log(`${COLORS.GREEN}PASS${COLORS.RESET} Auth - Register Success`);
+         // Check if token is returned
+         if (regRes.data && (regRes.data.access_token || regRes.data.accessToken)) {
+             console.log("Register returned token:", Object.keys(regRes.data));
+         } else {
+             console.log("Register did NOT return token. Data keys:", Object.keys(regRes.data || {}));
+         }
     } else {
          logResult('Auth - Register Fail', regRes);
     }

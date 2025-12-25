@@ -101,8 +101,18 @@ class PlayerStore {
 
   // Actions
   play(song) {
+    // Normalizing ID: API might return 'encodeId' or 'id'.
+    // Youtube Iframe needs video ID.
+    // If encodeId is present, we assume it serves as the YT ID for this clone.
+    const songId = song.encodeId || song.id;
+
+    if (!songId) {
+        console.error("Cannot play song without ID:", song);
+        return;
+    }
+
     // If playing the same song, just resume
-    if (this.state.currentSong && this.state.currentSong.encodeId === song.encodeId) {
+    if (this.state.currentSong && (this.state.currentSong.encodeId === songId || this.state.currentSong.id === songId)) {
        if (this.player && typeof this.player.playVideo === 'function') {
            this.player.playVideo();
        }
@@ -119,12 +129,7 @@ class PlayerStore {
     });
     
     if (this.player && typeof this.player.loadVideoById === 'function') {
-        // Assuming 'link' or 'encodeId' can be used to find proper video ID.
-        // YouTube Music clones usually map encodeId to a Video ID via another API or use the ID directly if available.
-        // For this task, let's assume `encodeId` IS the video ID or we have `videoId` prop.
-        // Looking at common APIs, it might be `encodeId`.
-        const videoId = song.encodeId; 
-        this.player.loadVideoById(videoId);
+        this.player.loadVideoById(songId);
     }
 
     // Queue logic
@@ -132,7 +137,7 @@ class PlayerStore {
         this.state.queue = [song];
         this.state.currentIndex = 0;
     } else {
-        const index = this.state.queue.findIndex(s => s.encodeId === song.encodeId);
+        const index = this.state.queue.findIndex(s => (s.encodeId === songId || s.id === songId));
         if (index === -1) {
              this.state.queue.push(song);
              this.setState({ currentIndex: this.state.queue.length - 1});

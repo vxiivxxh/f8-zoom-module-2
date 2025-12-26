@@ -118,10 +118,6 @@ class PlayerStore {
     });
     
     if (this.player && typeof this.player.loadVideoById === 'function') {
-        // Giả sử 'link' hoặc 'encodeId' có thể dùng để tìm Video ID.
-        // YouTube Music clones thường map encodeId sang Video ID qua API khác hoặc dùng ID trực tiếp nếu có.
-        // Với bài tập này, giả sử `encodeId` LÀ video ID hoặc chúng ta có prop `videoId`.
-        // Nhìn vào API thông thường, nó có thể là `encodeId`.
         const videoId = song.id; 
         this.player.loadVideoById(videoId);
     }

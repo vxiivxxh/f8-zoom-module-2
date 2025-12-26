@@ -1,8 +1,5 @@
 const API_BASE_URL = 'https://youtube-music.f8team.dev/api';
 
-/**
- * Wrapper fetch tùy chỉnh để xử lý logic API chung (headers, auth, lỗi)
- */
 export const apiClient = {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;

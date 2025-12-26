@@ -113,9 +113,8 @@ export const renderHome = async (router) => {
   }
 };
 
-// Helper: Render Section với Slider
+// 
 const renderSection = (title, items, id, subtitle = '') => {
-    // Giới hạn 6 item mỗi section vì hiệu năng và UX (User yêu cầu 3-5, 6 đảm bảo đầy hàng + 1 trên màn hình thường hoặc đủ để trông có dữ liệu)
     const displayItems = items.slice(0, 12); // Tăng slice để hỗ trợ responsive logic
 
     return `
@@ -138,11 +137,6 @@ const renderSection = (title, items, id, subtitle = '') => {
         </div>
         <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 snap-x">
             ${displayItems.map((item, index) => {
-                // Logic hiển thị responsive:
-                // Mobile (<640px): Hiển thị 3 items (Indices 0, 1, 2)
-                // sm (>=640px): Hiển thị 4 items (Index 3)
-                // md (>=768px): Hiển thị 5 items (Index 4)
-                // lg (>=1024px): Hiển thị 6 items (Index 5)
                 let responsiveClass = '';
                 if (index > 2) responsiveClass = 'hidden sm:block';
                 if (index > 3) responsiveClass = 'hidden md:block';
@@ -156,7 +150,7 @@ const renderSection = (title, items, id, subtitle = '') => {
     `;
 };
 
-// Helper: Component Card
+//
 const renderCard = (item) => {
     const rawTitle = item.title || item.name || 'Không có tiêu đề';
     const title = escapeHTML(rawTitle);

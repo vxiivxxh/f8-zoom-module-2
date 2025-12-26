@@ -12,7 +12,7 @@ export const renderExplore = async (router) => {
   try {
      const [newReleasesRes] = await Promise.all([
         apiClient.get('/explore/new-releases'),
-        // Thêm các cuộc gọi khác như Moods/Genres sau này
+       
      ]);
 
      // API trả về { items: [...] }
@@ -84,8 +84,6 @@ export const renderExplore = async (router) => {
                         sectionTitle.textContent = 'Mới phát hành';
                         // Giữ nguyên thứ tự ban đầu
                     } else {
-                        // Cho mục đích demo, chỉ random hoặc hiện thông báo cho các danh mục chưa thực hiện
-                        // Trong app thực tế, chúng ta sẽ fetch các endpoint cụ thể như /explore/moods/${category}
                         sectionTitle.textContent = `${category} (Demo)`;
                     }
                  }

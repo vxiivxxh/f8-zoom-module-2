@@ -1,5 +1,4 @@
 /**
- * Mã hóa các ký tự không an toàn trong chuỗi để ngăn chặn XSS.
  * @param {string} str - Chuỗi đầu vào cần mã hóa.
  * @returns {string} - Chuỗi đã được mã hóa.
  */

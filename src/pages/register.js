@@ -124,17 +124,9 @@ export const renderRegister = (router) => {
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đang đăng ký & đăng nhập...';
-
-    // Lưu ý: tham số register phụ thuộc vào cài đặt authStore.
-    // Chúng ta đã cập nhật authStore khớp với: register(name, email, password, confirmPassword)
     const result = await authStore.register(name, email, password, confirmPassword);
 
     if (result.success) {
-      // Tự động đăng nhập sau khi đăng ký hoặc chuyển hướng?
-      // Yêu cầu người dùng UX thường thích tự động đăng nhập hoặc chuyển hướng đến đăng nhập.
-      // Hãy chuyển hướng đến đăng nhập cho rõ ràng vì authStore.register thường không tự set token trừ khi API trả về nó.
-      // Kiểm tra authStore.js: nó KHÔNG set token khi đăng ký (hoặc có? - xem lại authStore). Ok, Code cũ không set. Code mới Auth của tôi có auto login.
-      // Nhưng để an toàn cứ redirect về login hoặc home (nếu auto login).
       router.navigate('/');
     } else {
       errorDiv.textContent = result.error || 'Đăng ký thất bại.';

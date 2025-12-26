@@ -40,8 +40,7 @@ router
 // Bảo vệ Route / Hooks
 router.hooks({
   before: async (done, params) => {
-    // Xác định xem route có được bảo vệ không (cho tương lai)
-    // Hiện tại, chúng ta chỉ đảm bảo có trạng thái user mới nhất
+    // chúng ta chỉ đảm bảo có trạng thái user mới nhất
     if (!authStore.isAuthenticated && localStorage.getItem('accessToken')) {
       // Cố gắng khôi phục phiên làm việc
       await authStore.init();
@@ -55,9 +54,6 @@ router.hooks({
 (async () => {
   // Nếu có token, chờ init hoàn tất để tránh nhấp nháy trạng thái "Guest"
   if (localStorage.getItem('accessToken')) {
-    // Chúng ta có thể subcribe để chờ loading hoàn tất, hoặc chỉ await init nếu đã expose nó
-    // authStore.init() được gọi trong constructor nhưng là async.
-    // Hãy dựa vào state của store hoặc độ trễ đơn giản cho giai đoạn này.
   }
   router.resolve();
 })();

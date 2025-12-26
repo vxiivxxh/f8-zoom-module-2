@@ -99,7 +99,7 @@ class AuthStore {
               await this.fetchCurrentUser();
           }
       } else {
-          // Nếu không có token, chỉ dừng loading (thường không xảy ra với API hiện tại)
+          // Nếu không có token, chỉ dừng loading 
           this.setState({ isLoading: false });
       }
 
@@ -125,8 +125,6 @@ class AuthStore {
   async fetchCurrentUser() {
     try {
       const response = await apiClient.get('/auth/me');
-      // Sửa lỗi: apiClient trả về data trực tiếp. Nếu response là object user, dùng nó.
-      // Nếu response có thuộc tính .data, dùng thuộc tính đó
       const userData = response.data || response;
       this.setState({ 
         user: userData, 

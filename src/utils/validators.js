@@ -10,20 +10,20 @@ export const validateEmail = (email) => {
 
 /**
  * Xác thực mật khẩu.
- * Quy tắc: Ít nhất 6 ký tự.
+ * Quy tắc: Ít nhất 8 ký tự.
  * @param {string} password 
  * @returns {boolean}
  */
 export const validatePassword = (password) => {
-  return password && password.length >= 6;
+  return password && password.length >= 8;
 };
 
 /**
  * Xác thực tên.
- * Quy tắc: Ít nhất 2 ký tự.
+ * Quy tắc: Ít nhất 25 ký tự.
  * @param {string} name 
  * @returns {boolean}
  */
 export const validateName = (name) => {
-  return name && name.trim().length >= 2;
+  return name && name.trim().length <= 25;
 };

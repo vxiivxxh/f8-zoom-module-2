@@ -20,10 +20,10 @@ export const validatePassword = (password) => {
 
 /**
  * Xác thực tên.
- * Quy tắc: Ít nhất 25 ký tự.
+ * Quy tắc: Ít nhất 2 ký tự.
  * @param {string} name 
  * @returns {boolean}
  */
 export const validateName = (name) => {
-  return name && name.trim().length <= 25;
+  return name && name.trim().length >= 2;
 };

@@ -264,7 +264,7 @@ const renderCard = (item) => {
     "https://via.placeholder.com/300";
 
   const id = item.encodeId || item.id;
-  const type = item.type || "song"; // default
+  const type = item.type || (item.albumType ? "album" : "song"); // Infer album if albumType exists
   const slug = item.slug || item.encodeId || "";
 
   return `

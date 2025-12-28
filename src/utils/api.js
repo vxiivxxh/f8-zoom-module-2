@@ -58,5 +58,13 @@ export const apiClient = {
 
   delete(endpoint, options = {}) {
     return this.request(endpoint, { ...options, method: 'DELETE' });
+  },
+
+  getChartVideos(options = {}) {
+    return this.get('/charts/videos', options);
+  },
+
+  getTopArtists(options = {}) {
+    return this.get('/charts/top-artists', options);
   }
 };

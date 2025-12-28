@@ -10,36 +10,77 @@ export const renderExplore = async (router) => {
   `, router);
 
   try {
-     const [newReleasesRes] = await Promise.all([
-        apiClient.get('/explore/new-releases'),
-       
+     const [newReleasesRes, chartVideosRes, topArtistsRes] = await Promise.all([
+       apiClient.get("/explore/new-releases"),
+       apiClient.getChartVideos(),
+       apiClient.getTopArtists(),
      ]);
 
      // API trả về { items: [...] }
      const newReleases = newReleasesRes.items || newReleasesRes.data || [];
+     const chartVideos = chartVideosRes.items || chartVideosRes.data || [];
+     const topArtists = topArtistsRes.items || topArtistsRes.data || [];
 
      // Mock chips cho Tâm trạng vì API có thể chưa bao gồm trực tiếp
-     const chips = ['Mới phát hành', 'Bảng xếp hạng', 'Tâm trạng', 'Pop', 'Rock', 'Hiphop v.v.'];
+     const chips = [
+       "Mới phát hành",
+       "Bảng xếp hạng",
+       "Tâm trạng",
+       "Pop",
+       "Rock",
+       "Hiphop v.v.",
+     ];
 
      const content = `
        <div class="space-y-8">
          <!-- Chips Navigation -->
          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-            ${chips.map((chip, idx) => `
+            ${chips
+              .map(
+                (chip, idx) => `
                <button 
-                  class="category-chip px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${idx === 0 ? 'bg-white text-black hover:bg-gray-200' : ''}"
+                  class="category-chip px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${
+                    idx === 0 ? "bg-white text-black hover:bg-gray-200" : ""
+                  }"
                   data-category="${chip}"
                >
                   ${chip}
                </button>
-            `).join('')}
+            `
+              )
+              .join("")}
          </div>
 
          <!-- Section: Mới phát hành -->
          <section>
             <h2 class="text-2xl font-bold mb-4">Mới phát hành</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${newReleases.slice(0, 10).map(item => renderCard(item)).join('')}
+               ${newReleases
+                 .slice(0, 10)
+                 .map((item) => renderCard(item))
+                 .join("")}
+            </div>
+         </section>
+
+         <!-- Section: Top Music Videos -->
+         <section>
+            <h2 class="text-2xl font-bold mb-4">Bảng xếp hạng Music Videos</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+               ${chartVideos
+                 .slice(0, 5)
+                 .map((item, index) => renderCard(item, index + 1))
+                 .join("")}
+            </div>
+         </section>
+
+         <!-- Section: Top Artists -->
+         <section>
+            <h2 class="text-2xl font-bold mb-4">Nghệ sĩ hàng đầu</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+               ${topArtists
+                 .slice(0, 5)
+                 .map((artist) => renderArtistCard(artist))
+                 .join("")}
             </div>
          </section>
        </div>
@@ -126,6 +167,26 @@ const renderCard = (item) => {
          </div>
          <h3 class="font-medium text-white truncate hover:underline" title="${title}">${title}</h3>
          <p class="text-sm text-yt-text-secondary truncate" title="${subtitle}">${subtitle}</p>
+      </div>
+    `;
+};
+
+const renderArtistCard = (artist) => {
+  const rawName = artist.name || "Unknown Artist";
+  const name = escapeHTML(rawName);
+  const image =
+    (artist.thumbnails && artist.thumbnails[0]) ||
+    artist.thumbnail ||
+    artist.image ||
+    "https://via.placeholder.com/300";
+
+  return `
+      <div class="group cursor-pointer flex flex-col items-center text-center">
+         <div class="relative w-full aspect-square mb-3 rounded-full overflow-hidden bg-gray-800">
+            <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+         </div>
+         <h3 class="font-medium text-white hover:underline" title="${name}">${name}</h3>
+         <p class="text-sm text-yt-text-secondary">Nghệ sĩ</p>
       </div>
     `;
 };

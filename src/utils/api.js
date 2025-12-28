@@ -78,5 +78,41 @@ export const apiClient = {
 
   getPersonalized(options = {}) {
     return this.get('/home/personalized', options);
+  },
+
+  getExploreAlbums(options = {}) {
+    return this.get('/explore/albums', options);
+  },
+
+  getExploreVideos(options = {}) {
+    return this.get('/explore/videos', options);
+  },
+
+  getExploreMeta(options = {}) {
+    return this.get('/explore/meta', options);
+  },
+
+  getSearchSuggestions(query, options = {}) {
+    return this.get(`/search/suggestions?q=${encodeURIComponent(query)}`, options);
+  },
+
+  search(query, options = {}) {
+    return this.get(`/search?q=${encodeURIComponent(query)}`, options);
+  },
+
+  getPlaylistDetail(slug, options = {}) {
+    return this.get(`/playlists/details/${slug}`, options);
+  },
+
+  getAlbumDetail(slug, options = {}) {
+    return this.get(`/albums/details/${slug}`, options);
+  },
+
+  getSongDetail(id, options = {}) {
+    return this.get(`/songs/details/${id}`, options);
+  },
+
+  getVideoDetail(id, options = {}) {
+    return this.get(`/videos/details/${id}`, options);
   }
 };

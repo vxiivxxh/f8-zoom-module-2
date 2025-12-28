@@ -1,5 +1,6 @@
 import { authStore } from '../store/authStore';
 import { uiStore } from '../store/uiStore';
+import { apiClient } from '../utils/api';
 
 export const Header = () => {
   const user = authStore.user;
@@ -9,15 +10,19 @@ export const Header = () => {
     <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-8 mb-4">
       <!-- Center: Search Bar -->
       <div class="flex items-center flex-1 max-w-xl">
-        <div class="relative w-full">
+        <div class="relative w-full group">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-yt-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
             <input 
+                id="search-input"
                 type="text" 
                 placeholder="Tìm kiếm bài hát, album, nghệ sĩ..." 
-                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-white/10 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-400"
+                class="block w-full p-2.5 pl-10 text-sm text-yt-text-primary bg-white/10 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-400 focus:bg-black"
+                autocomplete="off"
             >
+            <!-- Suggestions Dropdown -->
+            <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-2 bg-yt-player rounded-lg shadow-xl border border-gray-700 hidden overflow-hidden z-50"></div>
         </div>
       </div>
 
@@ -56,11 +61,91 @@ export const setupHeaderEvents = (router) => {
     // Toggle Sidebar
     const toggleBtn = document.getElementById('sidebar-toggle');
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', (e) => {
+        toggleBtn.addEventListener('click', () => {
             uiStore.toggleSidebar();
         });
     }
 
+    // Search Logic
+    const searchInput = document.getElementById('search-input');
+    const suggestionsBox = document.getElementById('search-suggestions');
+    let debounceTimeout;
+
+    if (searchInput && suggestionsBox) {
+        // Handle Input
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            clearTimeout(debounceTimeout);
+
+            if (query.length < 2) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            debounceTimeout = setTimeout(async () => {
+                try {
+                    const res = await apiClient.getSearchSuggestions(query);
+                    // API returns { suggestions: ["..."], ... } or { data: [...] }
+                    const rawData = res.data || {};
+                    const suggestions = rawData.suggestions || rawData.data || (Array.isArray(rawData) ? rawData : []);
+
+                    if (suggestions.length > 0) {
+                        suggestionsBox.innerHTML = suggestions.map(s => `
+                            <div class="px-4 py-2 hover:bg-white/10 cursor-pointer flex items-center gap-3 text-white" data-suggestion="${s}">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span class="text-sm font-medium">${s}</span>
+                            </div>
+                        `).join('');
+                        suggestionsBox.classList.remove('hidden');
+                    } else {
+                        suggestionsBox.classList.add('hidden');
+                    }
+                } catch (err) {
+                    console.error("Suggestion error", err);
+                }
+            }, 300);
+        });
+
+        // Handle Focus (Show suggestions if query exists)
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim().length >= 2 && suggestionsBox.children.length > 0) {
+                suggestionsBox.classList.remove('hidden');
+            }
+        });
+
+        // Handle Enter Key
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const term = searchInput.value.trim();
+                if (term) {
+                    router.navigate(`/search?q=${encodeURIComponent(term)}`);
+                    suggestionsBox.classList.add('hidden');
+                    searchInput.blur();
+                }
+            }
+        });
+
+        // Handle Click Suggestion
+        suggestionsBox.addEventListener('click', (e) => {
+            const item = e.target.closest('[data-suggestion]');
+            if (item) {
+                const term = item.dataset.suggestion;
+                searchInput.value = term; // Update input
+                router.navigate(`/search?q=${encodeURIComponent(term)}`);
+                suggestionsBox.classList.add('hidden');
+            }
+        });
+
+        // Close when clicking outside
+        const closeSearch = (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.add('hidden');
+            }
+        };
+        document.addEventListener('click', closeSearch);
+    }
+
+    // Logout Logic
     const logoutBtn = document.getElementById('header-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
@@ -73,37 +158,15 @@ export const setupHeaderEvents = (router) => {
         });
     }
 
-    // Toggle Dropdown
+    // Toggle Profile Dropdown
     const trigger = document.getElementById('profile-trigger');
     const dropdown = document.getElementById('profile-dropdown');
 
     if (trigger && dropdown) {
-        // Toggle khi click
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdown.classList.toggle('hidden');
         });
-
-        // Đóng khi click ra ngoài
-        // Chúng ta cần một hàm có tên để gỡ bỏ sau này nếu muốn code sạch hoàn toàn,
-        // nhưng với app đơn giản này, một document listener liên tục là chấp nhận được
-        // miễn là kiểm tra element có tồn tại hay không.
-        // Thực tế, vì setupHeaderEvents được gọi nhiều lần (re-render),
-        // adding document listener liên tục là KHÔNG TỐT. Nó sẽ chồng chất.
-        
-        // Giải pháp: Gỡ bỏ listener cũ nếu tồn tại? Khó tham chiếu.
-        // Tốt hơn: Dùng giải pháp clean hơn hoặc kiểm tra nếu listener đã gắn.
-        
-        // Hãy dùng cách đơn giản hơn: 
-        // Chúng ta có thể gắn thuộc tính `onclick` cho document.body, nhưng nó ghi đè người khác.
-        // Tốt nhất cho SPA cần dọn dẹp: Gắn event listener kiểm tra trigger/dropdown tồn tại.
-        // Nếu không tồn tại (vì Header bị xóa), nó không làm gì cả.
-        
-        // Thậm chí tốt hơn: MainLayout re-render Header. 
-        // Hãy tạo handler và gắn nó. 
-        // Để tránh trùng lặp, chúng ta có thể gắn vào `app` hoặc gỡ bỏ cái trước.
-        
-        // WORKAROUND cho việc gắn lại: Dùng thuộc tính tùy chỉnh trên document để lưu handler
         
         const closeDropdown = (e) => {
              if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
@@ -111,7 +174,7 @@ export const setupHeaderEvents = (router) => {
              }
         };
         
-        // Gỡ bỏ cái cũ để tránh trùng lặp nếu MainLayout gọi lại hàm này thường xuyên
+        // Gỡ bỏ cái cũ để tránh trùng lặp
         if (document._headerClickOutside) {
             document.removeEventListener('click', document._headerClickOutside);
         }

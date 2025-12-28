@@ -6,6 +6,7 @@ import { renderRegister } from './pages/register';
 import { renderHome } from './pages/home';
 import { renderExplore } from './pages/explore';
 import { renderLibrary } from './pages/library';
+import { renderSearch } from './pages/search';
 
 const router = new Navigo(import.meta.env.BASE_URL || '/');
 
@@ -20,6 +21,9 @@ router
     },
     '/library': () => {
         renderLibrary(router);
+    },
+    '/search': () => {
+        renderSearch(router);
     },
     '/login': () => {
       if (authStore.isAuthenticated) {

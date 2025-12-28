@@ -40,12 +40,7 @@ export const renderHome = async (router) => {
     const albums = Array.isArray(albumsRes) ? albumsRes : albumsRes.data || [];
     const hits = Array.isArray(hitsRes) ? hitsRes : hitsRes.data || [];
     // Sửa lỗi: Truy cập trực tiếp .items từ object phản hồi
-    const moods =
-      moodsRes && moodsRes.items
-        ? moodsRes.items
-        : Array.isArray(moodsRes)
-        ? moodsRes
-        : [];
+    const moods = moodsRes?.items || (Array.isArray(moodsRes) ? moodsRes : []);
     const countryPlaylists = Array.isArray(countryPlaylistsRes)
       ? countryPlaylistsRes
       : countryPlaylistsRes.data || [];
@@ -171,7 +166,7 @@ export const renderHome = async (router) => {
 
 // 
 const renderSection = (title, items, id, subtitle = '') => {
-    const displayItems = items.slice(0, 12); // Tăng slice để hỗ trợ responsive logic
+    const displayItems = items.slice(0, 12);
 
     return `
     <section>
@@ -191,16 +186,8 @@ const renderSection = (title, items, id, subtitle = '') => {
                 </button>
             </div>
         </div>
-        <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 scrollbar-none pb-4 snap-x">
-            ${displayItems.map((item, index) => {
-                let responsiveClass = '';
-                if (index > 2) responsiveClass = 'hidden sm:block';
-                if (index > 3) responsiveClass = 'hidden md:block';
-                if (index > 4) responsiveClass = 'hidden lg:block';
-                
-                // Bọc card trong div responsive
-                return `<div class="${responsiveClass}">${renderCard(item)}</div>`;
-            }).join('')}
+        <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 pb-4 snap-x scrollbar-styled">
+            ${displayItems.map((item) => `<div>${renderCard(item)}</div>`).join('')}
         </div>
     </section>
     `;
@@ -216,7 +203,7 @@ const renderCard = (item) => {
         : (item.description || '');
     const subtitle = escapeHTML(rawSubtitle);
         
-    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.image || 'https://via.placeholder.com/300';
+    const image = item.thumbnails?.[0] || item.thumbnail || item.image || 'https://via.placeholder.com/300';
     
     return `
       <div class="flex-shrink-0 w-48 group cursor-pointer song-card snap-start" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>

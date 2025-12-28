@@ -10,26 +10,42 @@ export const renderExplore = async (router) => {
   `, router);
 
   try {
-    const [newReleasesRes, chartVideosRes, topArtistsRes, moodsRes] =
+    const results =
       await Promise.all([
         apiClient.get("/explore/new-releases"),
         apiClient.getChartVideos(),
         apiClient.getTopArtists(),
-        apiClient.getMoods(),
+        apiClient.getExploreMeta(),    // Thay thế getMoods
+        apiClient.getExploreAlbums(), // Thay thế home/albums
+        apiClient.getExploreVideos(), // Thay thế home/hits
       ]);
 
-    const newReleases = newReleasesRes.items || newReleasesRes.data || [];
-    const chartVideos = chartVideosRes.items || chartVideosRes.data || [];
-    const topArtists = topArtistsRes.items || topArtistsRes.data || [];
-    const moods = moodsRes.items || moodsRes.data || [];
+    // Giải cấu trúc kết quả cẩn thận
+    const newReleasesRes = results[0];
+    const chartVideosRes = results[1];
+    const topArtistsRes = results[2];
+    const metaRes = results[3];
+    const albumsRes = results[4];
+    const videosRes = results[5];
 
-    // Map moods to chip structure, ensure we have a label
+    const newReleases = newReleasesRes?.items || newReleasesRes?.data || [];
+    const chartVideos = chartVideosRes?.items || chartVideosRes?.data || [];
+    const topArtists = topArtistsRes?.items || topArtistsRes?.data || [];
+    
+    // Meta returns { categories: [...] }
+    const moods = metaRes?.categories || metaRes?.data || [];
+    
+    // Videos returns { items: [...] }
+    const newAlbums = albumsRes?.items || albumsRes?.data || (Array.isArray(albumsRes) ? albumsRes : []);
+    const newVideos = videosRes?.items || videosRes?.data || (Array.isArray(videosRes) ? videosRes : []);
+
+    // Map moods sang cấu trúc chip, đảm bảo có nhãn
     const moodChips = moods.map((m) => ({
       label: m.title || m.name || "Unknown",
       slug: m.slug || "",
     }));
 
-    // Fallback if no moods
+    // Dự phòng nếu không có moods
     if (moodChips.length === 0) {
       [
         "Mới phát hành",
@@ -40,10 +56,8 @@ export const renderExplore = async (router) => {
         "Hiphop",
       ].forEach((c) => moodChips.push({ label: c, slug: "" }));
     } else {
-      // Add static chips if needed, or rely on API.
-      // Let's prepend "Mới phát hành" as it's the specific view of this page
+      // Thêm chip tĩnh nếu cần
       moodChips.unshift({ label: "Mới phát hành", slug: "new-releases" });
-      moodChips.splice(1, 0, { label: "Bảng xếp hạng", slug: "charts" });
     }
 
     const content = `
@@ -68,7 +82,7 @@ export const renderExplore = async (router) => {
          </div>
 
          <!-- Section: Mới phát hành -->
-         <section>
+         <section class="mb-8">
             <h2 class="text-2xl font-bold mb-4">Mới phát hành</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                ${newReleases
@@ -78,8 +92,8 @@ export const renderExplore = async (router) => {
             </div>
          </section>
 
-         <!-- Section: Top Music Videos -->
-         <section>
+         <!-- Section: Bảng xếp hạng Music Videos -->
+         <section class="mb-8">
             <h2 class="text-2xl font-bold mb-4">Bảng xếp hạng Music Videos</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                ${chartVideos
@@ -89,8 +103,8 @@ export const renderExplore = async (router) => {
             </div>
          </section>
 
-         <!-- Section: Top Artists -->
-         <section>
+         <!-- Section: Nghệ sĩ hàng đầu -->
+         <section class="mb-8">
             <h2 class="text-2xl font-bold mb-4">Nghệ sĩ hàng đầu</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                ${topArtists
@@ -202,6 +216,30 @@ const renderArtistCard = (artist) => {
          </div>
          <h3 class="font-medium text-white hover:underline" title="${name}">${name}</h3>
          <p class="text-sm text-yt-text-secondary">Nghệ sĩ</p>
+      </div>
+    `;
+};
+
+
+const renderMoodCard = (item) => {
+    const rawTitle = item.title || item.name || 'Mood';
+    const title = escapeHTML(rawTitle);
+    
+    // Random gradient nếu không có ảnh, hoặc dùng logic cụ thể
+    const gradients = [
+        'from-purple-600 to-blue-600',
+        'from-red-500 to-orange-500',
+        'from-green-500 to-teal-500',
+        'from-pink-500 to-rose-500'
+    ];
+    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+    
+    return `
+      <div class="group cursor-pointer relative h-32 rounded-lg overflow-hidden bg-gradient-to-br ${randomGradient} hover:scale-105 transition-transform duration-300">
+         <div class="absolute inset-0 p-4 flex items-center justify-center text-center">
+            <h3 class="text-xl font-bold text-white shadow-sm break-words">${title}</h3>
+         </div>
+         <a href="/explore?category=${item.slug || ''}" class="absolute inset-0" data-navigo></a>
       </div>
     `;
 };

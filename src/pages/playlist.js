@@ -17,15 +17,29 @@ export const renderPlaylist = async (router, params) => {
     `, router);
 
     try {
-        const res = await apiClient.getPlaylistDetails(slug);
-        const playlist = res.data || res; // Handle structure variation
+      const res = await apiClient.getPlaylistDetails(slug);
+      const playlist = res.data || res; // Handle structure variation
 
-        const title = escapeHTML(playlist.title || playlist.name || 'Playlist');
-        const description = escapeHTML(playlist.description || playlist.sortDescription || '');
-        const image = (playlist.thumbnails && playlist.thumbnails[0]) || playlist.thumbnail || 'https://via.placeholder.com/300';
-        const tracks = playlist.song?.items || playlist.songs || [];
+      const title = escapeHTML(playlist.title || playlist.name || "Playlist");
+      const description = escapeHTML(
+        playlist.description || playlist.sortDescription || ""
+      );
+      const image =
+        (playlist.thumbnails && playlist.thumbnails[0]) ||
+        playlist.thumbnail ||
+        "https://via.placeholder.com/300";
 
-        const content = `
+      // Fix: API returns structure { song: { items: [...] } } or just { songs: [...] } or { items: [...] }
+      let tracks = [];
+      if (playlist.song && Array.isArray(playlist.song.items)) {
+        tracks = playlist.song.items;
+      } else if (Array.isArray(playlist.songs)) {
+        tracks = playlist.songs;
+      } else if (Array.isArray(playlist.items)) {
+        tracks = playlist.items;
+      }
+
+      const content = `
             <div class="flex flex-col md:flex-row gap-8">
                 <!-- Header / Cover -->
                 <div class="flex-shrink-0 w-full md:w-80 flex flex-col items-center md:items-start text-center md:text-left">
@@ -55,23 +69,23 @@ export const renderPlaylist = async (router, params) => {
             </div>
         `;
 
-        MainLayout(content, router);
+      MainLayout(content, router);
 
-        // Add Listeners
-        const main = document.querySelector('main');
-        if (main) {
-             main.addEventListener('click', (e) => {
-                 const card = e.target.closest('.song-card');
-                 if (card) {
-                     try {
-                         const songData = JSON.parse(card.dataset.song);
-                         import('../store/playerStore').then(({ playerStore }) => {
-                             playerStore.play(songData);
-                         });
-                     } catch (err) { }
-                 }
-             });
-        }
+      // Add Listeners
+      const main = document.querySelector("main");
+      if (main) {
+        main.addEventListener("click", (e) => {
+          const card = e.target.closest(".song-card");
+          if (card) {
+            try {
+              const songData = JSON.parse(card.dataset.song);
+              import("../store/playerStore").then(({ playerStore }) => {
+                playerStore.play(songData);
+              });
+            } catch (err) {}
+          }
+        });
+      }
     } catch (error) {
         console.error('Playlist load error:', error);
         MainLayout(`

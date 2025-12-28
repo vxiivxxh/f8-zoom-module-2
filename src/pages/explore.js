@@ -3,11 +3,14 @@ import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 
 export const renderExplore = async (router) => {
-  MainLayout(`
+  MainLayout(
+    `
       <div class="flex items-center justify-center h-64">
           <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
-  `, router);
+  `,
+    router
+  );
 
   try {
     const [newReleasesRes, albumsRes, videosRes, metaRes] = await Promise.all([
@@ -104,13 +107,31 @@ export const renderExplore = async (router) => {
       main.addEventListener("click", (e) => {
         const card = e.target.closest(".song-card");
         if (card) {
-          try {
-            const songData = JSON.parse(card.dataset.song);
-            import("../store/playerStore").then(({ playerStore }) => {
-              playerStore.play(songData);
-            });
-          } catch (err) {
-            console.error("Failed to play song", err);
+          const isPlayBtn = e.target.closest(".play-button");
+          if (isPlayBtn) {
+            try {
+              const songData = JSON.parse(card.dataset.song);
+              import("../store/playerStore").then(({ playerStore }) => {
+                playerStore.play(songData);
+              });
+            } catch (err) {
+              console.error("Failed to play song", err);
+            }
+          } else {
+            // Navigate
+            const type = card.dataset.type;
+            const slug = card.dataset.slug;
+            const id = card.dataset.id;
+
+            if (type === "playlist") {
+              router.navigate(`/playlist/${slug || id}`);
+            } else if (type === "album") {
+              router.navigate(`/album/${slug || id}`);
+            } else if (type === "song") {
+              router.navigate(`/song/${id}`);
+            } else if (type === "video") {
+              router.navigate(`/video/${id}`);
+            }
           }
         }
 
@@ -141,35 +162,52 @@ export const renderExplore = async (router) => {
       });
     }
   } catch (error) {
-     console.error("Explore load error", error);
-     MainLayout(`
+    console.error("Explore load error", error);
+    MainLayout(
+      `
        <div class="text-center py-20 text-red-500">
            <h3 class="text-xl font-bold">Lỗi tải dữ liệu</h3>
            <p>${error.message}</p>
        </div>
-    `, router);
+    `,
+      router
+    );
   }
 };
 
 // Card đơn giản được sử dụng lại (Nên là một component chia sẻ trong app thực tế)
 const renderCard = (item) => {
-    const rawTitle = item.title || item.name || 'No Title';
-    const title = escapeHTML(rawTitle);
+  const rawTitle = item.title || item.name || "No Title";
+  const title = escapeHTML(rawTitle);
 
-    const rawSubtitle = Array.isArray(item.artists) 
-        ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
-        : '';
-    const subtitle = escapeHTML(rawSubtitle);
+  const rawSubtitle = Array.isArray(item.artists)
+    ? item.artists.map((a) => (typeof a === "string" ? a : a.name)).join(", ")
+    : "";
+  const subtitle = escapeHTML(rawSubtitle);
 
-    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.thumb || item.image || 'https://via.placeholder.com/300';
-    
-    return `
-      <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
+  const image =
+    (item.thumbnails && item.thumbnails[0]) ||
+    item.thumbnail ||
+    item.thumb ||
+    item.image ||
+    "https://via.placeholder.com/300";
+
+  const id = item.encodeId || item.id;
+  const type = item.type || "song";
+  const slug = item.slug || item.encodeId || "";
+
+  return `
+      <div class="group cursor-pointer song-card" 
+           data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'
+           data-type="${type}"
+           data-slug="${slug}"
+           data-id="${id}"
+      >
          <div class="relative aspect-square mb-3 rounded overflow-hidden bg-gray-800">
             <img src="${image}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-               <button class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center pl-1 hover:scale-110 transition-transform">
-                   <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+               <button class="play-button w-12 h-12 bg-white text-black rounded-full flex items-center justify-center pl-1 hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                </button>
             </div>
          </div>

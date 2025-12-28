@@ -12,95 +12,168 @@ export const renderHome = async (router) => {
   `, router);
 
   try {
-    // Fetch dữ liệu song song
-    const [albumsRes, hitsRes, quickPicksRes, moodsRes] = await Promise.all([
-       apiClient.get('/home/albums-for-you'),
-       apiClient.get('/home/todays-hits'),
-       apiClient.get('/quick-picks'),
-       apiClient.get('/moods')
-    ]);
+    // Chuẩn bị các promise song song
+    const promises = [
+      apiClient.get("/home/albums-for-you"),
+      apiClient.get("/home/todays-hits"),
+      apiClient.get("/quick-picks"),
+      apiClient.get("/moods"),
+      apiClient.getPlaylistsByCountry("VN"),
+    ];
+
+    // Nếu đã đăng nhập, thêm request personalized
+    const isLoggedIn = !!authStore.user;
+    if (isLoggedIn) {
+      promises.push(apiClient.getPersonalized());
+    }
+
+    // Fetch dữ liệu
+    const results = await Promise.all(promises);
+
+    // Destructure kết quả (lưu ý thứ tự)
+    const albumsRes = results[0];
+    const hitsRes = results[1];
+    const quickPicksRes = results[2];
+    const moodsRes = results[3];
+    const countryPlaylistsRes = results[4];
+    const personalizedRes = isLoggedIn ? results[5] : [];
 
     // API trả về mảng trực tiếp cho các endpoint này
-    const albums = Array.isArray(albumsRes) ? albumsRes : (albumsRes.data || []);
-    const hits = Array.isArray(hitsRes) ? hitsRes : (hitsRes.data || []);
-    const quickPicks = Array.isArray(quickPicksRes) ? quickPicksRes : (quickPicksRes.data || []);
+    const albums = Array.isArray(albumsRes) ? albumsRes : albumsRes.data || [];
+    const hits = Array.isArray(hitsRes) ? hitsRes : hitsRes.data || [];
+    const quickPicks = Array.isArray(quickPicksRes)
+      ? quickPicksRes
+      : quickPicksRes.data || [];
     // Sửa lỗi: Truy cập trực tiếp .items từ object phản hồi
-    const moods = (moodsRes && moodsRes.items) ? moodsRes.items : (Array.isArray(moodsRes) ? moodsRes : []);
-    
+    const moods =
+      moodsRes && moodsRes.items
+        ? moodsRes.items
+        : Array.isArray(moodsRes)
+        ? moodsRes
+        : [];
+    const countryPlaylists = Array.isArray(countryPlaylistsRes)
+      ? countryPlaylistsRes
+      : countryPlaylistsRes.data || [];
+    const personalized = Array.isArray(personalizedRes)
+      ? personalizedRes
+      : personalizedRes.data || [];
+
     // Cá nhân hóa người dùng
     const user = authStore.user;
-    const greeting = user ? `Xin chào, ${user.name}` : 'Xin chào';
+    const greeting = user ? `Xin chào, ${user.name}` : "Xin chào";
 
     const content = `
       <div class="space-y-10">
         <!-- Section: Welcome / Quick actions -->
         <div class="mb-6">
            <h1 class="text-3xl font-bold mb-2">${greeting}</h1>
-           ${!user ? '<p class="text-yt-text-secondary">Đăng nhập để xem lịch sử nghe nhạc và đề xuất riêng cho bạn.</p>' : ''}
+           ${
+             !user
+               ? '<p class="text-yt-text-secondary">Đăng nhập để xem lịch sử nghe nhạc và đề xuất riêng cho bạn.</p>'
+               : ""
+           }
         </div>
 
         <!-- Section: Moods / Categories -->
-        ${moods.length > 0 ? `
+        ${
+          moods.length > 0
+            ? `
         <div class="flex overflow-x-auto gap-3 pb-2 scrollbar-none -mx-8 px-8 mb-8 bg-transparent py-2 transition-all">
-            ${moods.map(mood => `
-                <a href="${import.meta.env.BASE_URL}explore?category=${mood.slug}" class="inline-flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors whitespace-nowrap border border-white/5" data-navigo>
+            ${moods
+              .map(
+                (mood) => `
+                <a href="${import.meta.env.BASE_URL}explore?category=${
+                  mood.slug
+                }" class="inline-flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors whitespace-nowrap border border-white/5" data-navigo>
                     ${mood.name}
                 </a>
-            `).join('')}
+            `
+              )
+              .join("")}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
         <!-- Section: Quick Picks -->
-        ${quickPicks.length > 0 ? renderSection('Gợi ý nhanh', quickPicks, 'quick-picks', 'Bắt đầu nhanh') : ''}
+        ${
+          quickPicks.length > 0
+            ? renderSection(
+                "Gợi ý nhanh",
+                quickPicks,
+                "quick-picks",
+                "Bắt đầu nhanh"
+              )
+            : ""
+        }
 
+        <!-- Section: Personalized (If logged in) -->
+        ${
+          isLoggedIn && personalized.length > 0
+            ? renderSection(
+                "Dành riêng cho bạn",
+                personalized,
+                "personalized",
+                "Dựa trên lịch sử nghe nhạc"
+              )
+            : ""
+        }
+        
         <!-- Section 1: Albums for you -->
-        ${renderSection('Gợi ý Album', albums, 'albums')}
+        ${renderSection("Gợi ý Album", albums, "albums")}
 
         <!-- Section 2: Today's Hits -->
-        ${renderSection('Hit Hôm Nay', hits, 'hits')}
+        ${renderSection("Hit Hôm Nay", hits, "hits")}
+
+        <!-- Section 3: Country Playlists -->
+        ${renderSection(
+          "Tuyển tập Việt Nam",
+          countryPlaylists,
+          "country-playlists",
+          "Khám phá âm nhạc Việt"
+        )}
       </div>
     `;
 
-     MainLayout(content, router);
+    MainLayout(content, router);
 
-     // Event Delegation cho Song Cards & Nút cuộn
-     const main = document.querySelector('main');
-     if (main) {
-         // Xử lý click vào Card
-         main.addEventListener('click', (e) => {
-             const card = e.target.closest('.song-card');
-             if (card) {
-                 try {
-                     const songData = JSON.parse(card.dataset.song);
-                     import('../store/playerStore').then(({ playerStore }) => {
-                         playerStore.play(songData);
-                     });
-                 } catch (err) {
-                     console.error('Failed to play song', err);
-                 }
-             }
-         });
+    // Event Delegation cho Song Cards & Nút cuộn
+    const main = document.querySelector("main");
+    if (main) {
+      // Xử lý click vào Card
+      main.addEventListener("click", (e) => {
+        const card = e.target.closest(".song-card");
+        if (card) {
+          try {
+            const songData = JSON.parse(card.dataset.song);
+            import("../store/playerStore").then(({ playerStore }) => {
+              playerStore.play(songData);
+            });
+          } catch (err) {
+            console.error("Failed to play song", err);
+          }
+        }
+      });
 
-         // Xử lý nút cuộn
-         const scrollBtns = main.querySelectorAll('[data-scroll]');
-         scrollBtns.forEach(btn => {
-             btn.addEventListener('click', (e) => {
-                 const direction = e.currentTarget.dataset.scroll; // 'left' hoặc 'right'
-                 const targetId = e.currentTarget.dataset.target;
-                 const container = document.getElementById(targetId);
-                 
-                 if (container) {
-                     const scrollAmount = container.clientWidth * 0.75;
-                     if (direction === 'left') {
-                         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                     } else {
-                         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                     }
-                 }
-             });
-         });
-     }
+      // Xử lý nút cuộn
+      const scrollBtns = main.querySelectorAll("[data-scroll]");
+      scrollBtns.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const direction = e.currentTarget.dataset.scroll; // 'left' hoặc 'right'
+          const targetId = e.currentTarget.dataset.target;
+          const container = document.getElementById(targetId);
 
+          if (container) {
+            const scrollAmount = container.clientWidth * 0.75;
+            if (direction === "left") {
+              container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+            } else {
+              container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            }
+          }
+        });
+      });
+    }
   } catch (error) {
     console.error("Home load error", error);
     MainLayout(`

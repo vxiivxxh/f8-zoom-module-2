@@ -70,5 +70,13 @@ export const apiClient = {
 
   getMoods(options = {}) {
     return this.get('/moods', options);
+  },
+
+  getPlaylistsByCountry(country, options = {}) {
+    return this.get(`/playlists/by-country?country=${country}`, options);
+  },
+
+  getPersonalized(options = {}) {
+    return this.get('/home/personalized', options);
   }
 };

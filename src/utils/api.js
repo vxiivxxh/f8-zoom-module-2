@@ -91,4 +91,20 @@ export const apiClient = {
   getPersonalized(options = {}) {
     return this.get("/home/personalized", options);
   },
+
+  getPlaylistDetails(slug, options = {}) {
+    return this.get(`/playlists/details/${slug}`, options);
+  },
+
+  getAlbumDetails(slug, options = {}) {
+    return this.get(`/albums/details/${slug}`, options);
+  },
+
+  getSongDetails(id, options = {}) {
+    return this.get(`/songs/details/${id}`, options);
+  },
+
+  getVideoDetails(id, options = {}) {
+    return this.get(`/videos/details/${id}`, options);
+  },
 };

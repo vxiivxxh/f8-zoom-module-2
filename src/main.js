@@ -6,36 +6,50 @@ import { renderRegister } from './pages/register';
 import { renderHome } from './pages/home';
 import { renderExplore } from './pages/explore';
 import { renderLibrary } from './pages/library';
+import { renderPlaylist } from "./pages/playlist";
+import { renderAlbum } from "./pages/album";
+import { renderMedia } from "./pages/media";
 
 const router = new Navigo(import.meta.env.BASE_URL || '/');
 
 // Định nghĩa Route
-router
-  .on({
-    '/': () => {
-      renderHome(router);
-    },
-    '/explore': () => {
-        renderExplore(router);
-    },
-    '/library': () => {
-        renderLibrary(router);
-    },
-    '/login': () => {
-      if (authStore.isAuthenticated) {
-        router.navigate('/');
-      } else {
-        renderLogin(router);
-      }
-    },
-    '/register': () => {
-      if (authStore.isAuthenticated) {
-        router.navigate('/');
-      } else {
-        renderRegister(router);
-      }
+router.on({
+  "/": () => {
+    renderHome(router);
+  },
+  "/explore": () => {
+    renderExplore(router);
+  },
+  "/library": () => {
+    renderLibrary(router);
+  },
+  "/playlist/:slug": (params) => {
+    renderPlaylist(router, params.data);
+  },
+  "/album/:slug": (params) => {
+    renderAlbum(router, params.data);
+  },
+  "/song/:id": (params) => {
+    renderMedia(router, params.data);
+  },
+  "/video/:id": (params) => {
+    renderMedia(router, params.data);
+  },
+  "/login": () => {
+    if (authStore.isAuthenticated) {
+      router.navigate("/");
+    } else {
+      renderLogin(router);
     }
-  });
+  },
+  "/register": () => {
+    if (authStore.isAuthenticated) {
+      router.navigate("/");
+    } else {
+      renderRegister(router);
+    }
+  },
+});
 
 // Bảo vệ Route / Hooks
 router.hooks({

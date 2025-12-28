@@ -66,5 +66,9 @@ export const apiClient = {
 
   getTopArtists(options = {}) {
     return this.get('/charts/top-artists', options);
+  },
+
+  getMoods(options = {}) {
+    return this.get('/moods', options);
   }
 };

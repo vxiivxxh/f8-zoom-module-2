@@ -10,41 +10,57 @@ export const renderExplore = async (router) => {
   `, router);
 
   try {
-     const [newReleasesRes, chartVideosRes, topArtistsRes] = await Promise.all([
-       apiClient.get("/explore/new-releases"),
-       apiClient.getChartVideos(),
-       apiClient.getTopArtists(),
-     ]);
+    const [newReleasesRes, chartVideosRes, topArtistsRes, moodsRes] =
+      await Promise.all([
+        apiClient.get("/explore/new-releases"),
+        apiClient.getChartVideos(),
+        apiClient.getTopArtists(),
+        apiClient.getMoods(),
+      ]);
 
-     // API trả về { items: [...] }
-     const newReleases = newReleasesRes.items || newReleasesRes.data || [];
-     const chartVideos = chartVideosRes.items || chartVideosRes.data || [];
-     const topArtists = topArtistsRes.items || topArtistsRes.data || [];
+    const newReleases = newReleasesRes.items || newReleasesRes.data || [];
+    const chartVideos = chartVideosRes.items || chartVideosRes.data || [];
+    const topArtists = topArtistsRes.items || topArtistsRes.data || [];
+    const moods = moodsRes.items || moodsRes.data || [];
 
-     // Mock chips cho Tâm trạng vì API có thể chưa bao gồm trực tiếp
-     const chips = [
-       "Mới phát hành",
-       "Bảng xếp hạng",
-       "Tâm trạng",
-       "Pop",
-       "Rock",
-       "Hiphop v.v.",
-     ];
+    // Map moods to chip structure, ensure we have a label
+    const moodChips = moods.map((m) => ({
+      label: m.title || m.name || "Unknown",
+      slug: m.slug || "",
+    }));
 
-     const content = `
+    // Fallback if no moods
+    if (moodChips.length === 0) {
+      [
+        "Mới phát hành",
+        "Bảng xếp hạng",
+        "Tâm trạng",
+        "Pop",
+        "Rock",
+        "Hiphop",
+      ].forEach((c) => moodChips.push({ label: c, slug: "" }));
+    } else {
+      // Add static chips if needed, or rely on API.
+      // Let's prepend "Mới phát hành" as it's the specific view of this page
+      moodChips.unshift({ label: "Mới phát hành", slug: "new-releases" });
+      moodChips.splice(1, 0, { label: "Bảng xếp hạng", slug: "charts" });
+    }
+
+    const content = `
        <div class="space-y-8">
          <!-- Chips Navigation -->
          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-            ${chips
+            ${moodChips
               .map(
                 (chip, idx) => `
                <button 
                   class="category-chip px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${
                     idx === 0 ? "bg-white text-black hover:bg-gray-200" : ""
                   }"
-                  data-category="${chip}"
+                  data-category="${chip.label}"
+                  data-slug="${chip.slug}"
                >
-                  ${chip}
+                  ${chip.label}
                </button>
             `
               )
@@ -85,53 +101,52 @@ export const renderExplore = async (router) => {
          </section>
        </div>
      `;
-     
-     MainLayout(content, router);
 
-     // Ủy quyền sự kiện cho Song Cards
-     const main = document.querySelector('main');
-     if (main) {
-         // Click vào Song Card
-         main.addEventListener('click', (e) => {
-             const card = e.target.closest('.song-card');
-             if (card) {
-                 try {
-                     const songData = JSON.parse(card.dataset.song);
-                     import('../store/playerStore').then(({ playerStore }) => {
-                         playerStore.play(songData);
-                     });
-                 } catch (err) {
-                     console.error('Failed to play song', err);
-                 }
-             }
+    MainLayout(content, router);
 
-             // Click vào Category Chip
-             const chip = e.target.closest('.category-chip');
-             if (chip) {
-                 const category = chip.dataset.category;
-                 
-                 // Cập nhật trạng thái active
-                 document.querySelectorAll('.category-chip').forEach(btn => {
-                     btn.classList.remove('bg-white', 'text-black', 'hover:bg-gray-200');
-                     btn.classList.add('bg-yt-hover', 'text-white');
-                 });
-                 chip.classList.remove('bg-yt-hover', 'text-white');
-                 chip.classList.add('bg-white', 'text-black', 'hover:bg-gray-200');
+    // Ủy quyền sự kiện cho Song Cards
+    const main = document.querySelector("main");
+    if (main) {
+      // Click vào Song Card
+      main.addEventListener("click", (e) => {
+        const card = e.target.closest(".song-card");
+        if (card) {
+          try {
+            const songData = JSON.parse(card.dataset.song);
+            import("../store/playerStore").then(({ playerStore }) => {
+              playerStore.play(songData);
+            });
+          } catch (err) {
+            console.error("Failed to play song", err);
+          }
+        }
 
-                 // Logic lọc (Mô phỏng phía client vì hỗ trợ API hạn chế cho các chips cụ thể này)
-                 const sectionTitle = document.querySelector('h2');
-                 if (sectionTitle) {
-                    if (category === 'Mới phát hành') {
-                        sectionTitle.textContent = 'Mới phát hành';
-                        // Giữ nguyên thứ tự ban đầu
-                    } else {
-                        sectionTitle.textContent = `${category} (Demo)`;
-                    }
-                 }
-             }
-         });
-     }
+        // Click vào Category Chip
+        const chip = e.target.closest(".category-chip");
+        if (chip) {
+          const category = chip.dataset.category;
 
+          // Cập nhật trạng thái active
+          document.querySelectorAll(".category-chip").forEach((btn) => {
+            btn.classList.remove("bg-white", "text-black", "hover:bg-gray-200");
+            btn.classList.add("bg-yt-hover", "text-white");
+          });
+          chip.classList.remove("bg-yt-hover", "text-white");
+          chip.classList.add("bg-white", "text-black", "hover:bg-gray-200");
+
+          // Logic lọc (Mô phỏng phía client vì hỗ trợ API hạn chế cho các chips cụ thể này)
+          const sectionTitle = document.querySelector("h2");
+          if (sectionTitle) {
+            if (category === "Mới phát hành") {
+              sectionTitle.textContent = "Mới phát hành";
+              // Giữ nguyên thứ tự ban đầu
+            } else {
+              sectionTitle.textContent = `${category} (Demo)`;
+            }
+          }
+        }
+      });
+    }
   } catch (error) {
      console.error("Explore load error", error);
      MainLayout(`

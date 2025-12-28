@@ -3,17 +3,17 @@ const API_BASE_URL = 'https://youtube-music.f8team.dev/api';
 export const apiClient = {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     // Headers mặc định
     const headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     };
 
     // Thêm Authorization header nếu có token
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const config = {
@@ -26,50 +26,62 @@ export const apiClient = {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Lỗi API');
+        throw new Error(data.message || "Lỗi API");
       }
 
       return data;
     } catch (error) {
-      console.error('Yêu cầu API thất bại:', error);
+      console.error("Yêu cầu API thất bại:", error);
       throw error;
     }
   },
 
   get(endpoint, options = {}) {
-    return this.request(endpoint, { ...options, method: 'GET' });
+    return this.request(endpoint, { ...options, method: "GET" });
   },
 
   post(endpoint, body, options = {}) {
-    return this.request(endpoint, { 
-      ...options, 
-      method: 'POST',
-      body: JSON.stringify(body)
+    return this.request(endpoint, {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(body),
     });
   },
 
   put(endpoint, body, options = {}) {
     return this.request(endpoint, {
       ...options,
-      method: 'PUT',
-      body: JSON.stringify(body)
+      method: "PUT",
+      body: JSON.stringify(body),
     });
   },
 
   delete(endpoint, options = {}) {
-    return this.request(endpoint, { ...options, method: 'DELETE' });
+    return this.request(endpoint, { ...options, method: "DELETE" });
   },
 
   getChartVideos(options = {}) {
-    return this.get('/charts/videos', options);
+    return this.get("/charts/videos", options);
   },
 
   getTopArtists(options = {}) {
-    return this.get('/charts/top-artists', options);
+    return this.get("/charts/top-artists", options);
   },
 
   getMoods(options = {}) {
-    return this.get('/moods', options);
+    return this.get("/moods", options);
+  },
+
+  getExploreAlbums(options = {}) {
+    return this.get("/explore/albums", options);
+  },
+
+  getExploreVideos(options = {}) {
+    return this.get("/explore/videos", options);
+  },
+
+  getExploreMeta(options = {}) {
+    return this.get("/explore/meta", options);
   },
 
   getPlaylistsByCountry(country, options = {}) {
@@ -77,6 +89,6 @@ export const apiClient = {
   },
 
   getPersonalized(options = {}) {
-    return this.get('/home/personalized', options);
-  }
+    return this.get("/home/personalized", options);
+  },
 };

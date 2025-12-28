@@ -10,40 +10,33 @@ export const renderExplore = async (router) => {
   `, router);
 
   try {
-    const [newReleasesRes, chartVideosRes, topArtistsRes, moodsRes] =
-      await Promise.all([
-        apiClient.get("/explore/new-releases"),
-        apiClient.getChartVideos(),
-        apiClient.getTopArtists(),
-        apiClient.getMoods(),
-      ]);
+    const [newReleasesRes, albumsRes, videosRes, metaRes] = await Promise.all([
+      apiClient.get("/explore/new-releases"),
+      apiClient.getExploreAlbums(),
+      apiClient.getExploreVideos(),
+      apiClient.getExploreMeta(),
+    ]);
 
     const newReleases = newReleasesRes.items || newReleasesRes.data || [];
-    const chartVideos = chartVideosRes.items || chartVideosRes.data || [];
-    const topArtists = topArtistsRes.items || topArtistsRes.data || [];
-    const moods = moodsRes.items || moodsRes.data || [];
+    const albums = albumsRes.items || albumsRes.data || [];
+    const videos = videosRes.items || videosRes.data || [];
+    const meta = metaRes.items || metaRes.data || [];
 
     // Map moods to chip structure, ensure we have a label
-    const moodChips = moods.map((m) => ({
+    // Map meta to chip structure
+    const moodChips = meta.map((m) => ({
       label: m.title || m.name || "Unknown",
       slug: m.slug || "",
     }));
 
-    // Fallback if no moods
+    // Fallback if no meta
     if (moodChips.length === 0) {
-      [
-        "Mới phát hành",
-        "Bảng xếp hạng",
-        "Tâm trạng",
-        "Pop",
-        "Rock",
-        "Hiphop",
-      ].forEach((c) => moodChips.push({ label: c, slug: "" }));
+      ["Tâm trạng", "Thể loại", "Buồn", "Vui", "Sôi động", "Thư giãn"].forEach(
+        (c) => moodChips.push({ label: c, slug: "" })
+      );
     } else {
-      // Add static chips if needed, or rely on API.
-      // Let's prepend "Mới phát hành" as it's the specific view of this page
+      // Prepend specific views
       moodChips.unshift({ label: "Mới phát hành", slug: "new-releases" });
-      moodChips.splice(1, 0, { label: "Bảng xếp hạng", slug: "charts" });
     }
 
     const content = `
@@ -78,24 +71,24 @@ export const renderExplore = async (router) => {
             </div>
          </section>
 
-         <!-- Section: Top Music Videos -->
+         <!-- Section: Album mới nhất -->
          <section>
-            <h2 class="text-2xl font-bold mb-4">Bảng xếp hạng Music Videos</h2>
+            <h2 class="text-2xl font-bold mb-4">Album mới nhất</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${chartVideos
-                 .slice(0, 5)
-                 .map((item, index) => renderCard(item, index + 1))
+               ${albums
+                 .slice(0, 10)
+                 .map((item) => renderCard(item))
                  .join("")}
             </div>
          </section>
 
-         <!-- Section: Top Artists -->
+         <!-- Section: Video mới nhất -->
          <section>
-            <h2 class="text-2xl font-bold mb-4">Nghệ sĩ hàng đầu</h2>
+            <h2 class="text-2xl font-bold mb-4">Video mới nhất</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${topArtists
-                 .slice(0, 5)
-                 .map((artist) => renderArtistCard(artist))
+               ${videos
+                 .slice(0, 5) // Videos might take more space or play inline, keep limit 5
+                 .map((item) => renderCard(item)) // Videos use same card for now
                  .join("")}
             </div>
          </section>

@@ -23,7 +23,12 @@ export const renderAlbum = async (router, params) => {
         const title = escapeHTML(album.title || album.name || 'Album');
         const description = escapeHTML(album.description || (album.artists ? album.artists.map(a => a.name).join(', ') : ''));
         const image = (album.thumbnails && album.thumbnails[0]) || album.thumbnail || 'https://via.placeholder.com/300';
-        const tracks = album.songs || [];
+          (album.thumbnails && album.thumbnails[0]) ||
+            album.thumbnail ||
+            "https://via.placeholder.com/300";
+
+          // Fix: API confirmed to use 'tracks'
+          const tracks = album.tracks || album.songs || [];
 
         const content = `
             <div class="flex flex-col md:flex-row gap-8">

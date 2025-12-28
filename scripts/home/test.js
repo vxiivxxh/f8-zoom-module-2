@@ -26,10 +26,6 @@ export async function runHomeTests() {
     const hitsRes = await request('/home/todays-hits');
     logResult('Home - Today Hits', hitsRes);
 
-    // Quick Picks
-    const quickPicksRes = await request('/quick-picks');
-    logResult('Home - Quick Picks', quickPicksRes);
-
     // Personalized
     if (context.token) {
         const personalRes = await request('/home/personalized');

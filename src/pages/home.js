@@ -16,7 +16,6 @@ export const renderHome = async (router) => {
     const promises = [
       apiClient.get("/home/albums-for-you"),
       apiClient.get("/home/todays-hits"),
-      apiClient.get("/quick-picks"),
       apiClient.get("/moods"),
       apiClient.getPlaylistsByCountry("VN"),
     ];
@@ -33,17 +32,13 @@ export const renderHome = async (router) => {
     // Destructure kết quả (lưu ý thứ tự)
     const albumsRes = results[0];
     const hitsRes = results[1];
-    const quickPicksRes = results[2];
-    const moodsRes = results[3];
-    const countryPlaylistsRes = results[4];
-    const personalizedRes = isLoggedIn ? results[5] : [];
+    const moodsRes = results[2];
+    const countryPlaylistsRes = results[3];
+    const personalizedRes = isLoggedIn ? results[4] : [];
 
     // API trả về mảng trực tiếp cho các endpoint này
     const albums = Array.isArray(albumsRes) ? albumsRes : albumsRes.data || [];
     const hits = Array.isArray(hitsRes) ? hitsRes : hitsRes.data || [];
-    const quickPicks = Array.isArray(quickPicksRes)
-      ? quickPicksRes
-      : quickPicksRes.data || [];
     // Sửa lỗi: Truy cập trực tiếp .items từ object phản hồi
     const moods =
       moodsRes && moodsRes.items
@@ -92,18 +87,6 @@ export const renderHome = async (router) => {
               .join("")}
         </div>
         `
-            : ""
-        }
-
-        <!-- Section: Quick Picks -->
-        ${
-          quickPicks.length > 0
-            ? renderSection(
-                "Gợi ý nhanh",
-                quickPicks,
-                "quick-picks",
-                "Bắt đầu nhanh"
-              )
             : ""
         }
 

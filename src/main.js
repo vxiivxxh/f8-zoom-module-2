@@ -7,39 +7,50 @@ import { renderHome } from './pages/home';
 import { renderExplore } from './pages/explore';
 import { renderLibrary } from './pages/library';
 import { renderSearch } from './pages/search';
+import { renderNewReleases } from "./pages/new_releases";
+import { renderCharts } from "./pages/charts";
+import { renderMoodsGenres } from "./pages/moods_genres";
 
 const router = new Navigo(import.meta.env.BASE_URL || '/');
 
 // Định nghĩa Route
-router
-  .on({
-    '/': () => {
-      renderHome(router);
-    },
-    '/explore': () => {
-        renderExplore(router);
-    },
-    '/library': () => {
-        renderLibrary(router);
-    },
-    '/search': () => {
-        renderSearch(router);
-    },
-    '/login': () => {
-      if (authStore.isAuthenticated) {
-        router.navigate('/');
-      } else {
-        renderLogin(router);
-      }
-    },
-    '/register': () => {
-      if (authStore.isAuthenticated) {
-        router.navigate('/');
-      } else {
-        renderRegister(router);
-      }
+router.on({
+  "/": () => {
+    renderHome(router);
+  },
+  "/explore": () => {
+    renderExplore(router);
+  },
+  "/new_releases": () => {
+    renderNewReleases(router);
+  },
+  "/charts": () => {
+    renderCharts(router);
+  },
+  "/moods_and_genres": () => {
+    renderMoodsGenres(router);
+  },
+  "/library": () => {
+    renderLibrary(router);
+  },
+  "/search": () => {
+    renderSearch(router);
+  },
+  "/login": () => {
+    if (authStore.isAuthenticated) {
+      router.navigate("/");
+    } else {
+      renderLogin(router);
     }
-  });
+  },
+  "/register": () => {
+    if (authStore.isAuthenticated) {
+      router.navigate("/");
+    } else {
+      renderRegister(router);
+    }
+  },
+});
 
 // Bảo vệ Route / Hooks
 router.hooks({

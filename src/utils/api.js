@@ -128,4 +128,12 @@ export const apiClient = {
   getVideoDetail(id, options = {}) {
     return this.get(`/videos/details/${id}`, options);
   },
+  getCategories(options = {}) {
+    return this.get("/categories", options);
+  },
+
+  getLines(params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/lines?${qs}`, options);
+  },
 };

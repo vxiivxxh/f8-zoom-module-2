@@ -1,128 +1,66 @@
 import { apiClient } from '../utils/api';
 import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
+import { Icons } from "../components/Icons";
 
 export const renderExplore = async (router) => {
-  MainLayout(`
+  MainLayout(
+    `
       <div class="flex items-center justify-center h-64">
           <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
-  `, router);
+  `,
+    router
+  );
 
   try {
-    const results =
-      await Promise.all([
-        apiClient.get("/explore/new-releases"),
-        apiClient.getChartVideos(),
-        apiClient.getTopArtists(),
-        apiClient.getExploreMeta(),    // Thay thế getMoods
-        apiClient.getExploreAlbums(), // Thay thế home/albums
-        apiClient.getExploreVideos(), // Thay thế home/hits
-      ]);
+    const results = await Promise.all([
+      apiClient.getExploreAlbums(),
+      apiClient.getExploreMeta(),
+      apiClient.getExploreVideos(),
+    ]);
 
-    // Giải cấu trúc kết quả cẩn thận
-    const newReleasesRes = results[0];
-    const chartVideosRes = results[1];
-    const topArtistsRes = results[2];
-    const metaRes = results[3];
-    const albumsRes = results[4];
-    const videosRes = results[5];
+    const albumsRes = results[0];
+    const metaRes = results[1];
+    const videosRes = results[2];
 
-    const newReleases = newReleasesRes?.items || newReleasesRes?.data || [];
-    const chartVideos = chartVideosRes?.items || chartVideosRes?.data || [];
-    const topArtists = topArtistsRes?.items || topArtistsRes?.data || [];
-    
-    // Meta returns { categories: [...] }
+    const albums = albumsRes?.items || albumsRes?.data || [];
     const moods = metaRes?.categories || metaRes?.data || [];
-    
-    // Videos returns { items: [...] }
-    const newAlbums = albumsRes?.items || albumsRes?.data || (Array.isArray(albumsRes) ? albumsRes : []);
-    const newVideos = videosRes?.items || videosRes?.data || (Array.isArray(videosRes) ? videosRes : []);
-
-    // Map moods sang cấu trúc chip, đảm bảo có nhãn
-    const moodChips = moods.map((m) => ({
-      label: m.title || m.name || "Unknown",
-      slug: m.slug || "",
-    }));
-
-    // Dự phòng nếu không có moods
-    if (moodChips.length === 0) {
-      [
-        "Mới phát hành",
-        "Bảng xếp hạng",
-        "Tâm trạng",
-        "Pop",
-        "Rock",
-        "Hiphop",
-      ].forEach((c) => moodChips.push({ label: c, slug: "" }));
-    } else {
-      // Thêm chip tĩnh nếu cần
-      moodChips.unshift({ label: "Mới phát hành", slug: "new-releases" });
-    }
+    const videos = videosRes?.items || videosRes?.data || [];
 
     const content = `
-       <div class="space-y-8">
-         <!-- Chips Navigation -->
-         <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-            ${moodChips
-              .map(
-                (chip, idx) => `
-               <button 
-                  class="category-chip px-4 py-2 bg-yt-hover rounded-lg text-sm font-medium whitespace-nowrap hover:bg-white/20 transition-colors ${
-                    idx === 0 ? "bg-white text-black hover:bg-gray-200" : ""
-                  }"
-                  data-category="${chip.label}"
-                  data-slug="${chip.slug}"
-               >
-                  ${chip.label}
-               </button>
-            `
-              )
-              .join("")}
-         </div>
+       <div class="space-y-12">
+         ${renderTopNavigation()}
+         
+         ${renderCarouselSection({
+           title: "Khám phá Albums mới",
+           id: "explore-albums-carousel",
+           items: albums.slice(0, 10),
+           type: "album",
+           hasMore: true,
+         })}
 
-         <!-- Section: Mới phát hành -->
-         <section class="mb-8">
-            <h2 class="text-2xl font-bold mb-4">Mới phát hành</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${newReleases
-                 .slice(0, 10)
-                 .map((item) => renderCard(item))
-                 .join("")}
-            </div>
-         </section>
+         ${renderGridSection({
+           title: "Tâm trạng và thể loại",
+           items: moods.slice(0, 12),
+         })}
 
-         <!-- Section: Bảng xếp hạng Music Videos -->
-         <section class="mb-8">
-            <h2 class="text-2xl font-bold mb-4">Bảng xếp hạng Music Videos</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${chartVideos
-                 .slice(0, 5)
-                 .map((item, index) => renderCard(item, index + 1))
-                 .join("")}
-            </div>
-         </section>
-
-         <!-- Section: Nghệ sĩ hàng đầu -->
-         <section class="mb-8">
-            <h2 class="text-2xl font-bold mb-4">Nghệ sĩ hàng đầu</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-               ${topArtists
-                 .slice(0, 5)
-                 .map((artist) => renderArtistCard(artist))
-                 .join("")}
-            </div>
-         </section>
+         ${renderCarouselSection({
+           title: "Video nhạc mới",
+           id: "explore-videos-carousel",
+           items: videos.slice(0, 10),
+           type: "video",
+         })}
        </div>
-     `;
+    `;
 
     MainLayout(content, router);
 
-    // Ủy quyền sự kiện cho Song Cards
+    // 1. Event Delegation for Song Cards
     const main = document.querySelector("main");
     if (main) {
-      // Click vào Song Card
       main.addEventListener("click", (e) => {
+        // Toggle Play
         const card = e.target.closest(".song-card");
         if (card) {
           try {
@@ -135,62 +73,68 @@ export const renderExplore = async (router) => {
           }
         }
 
-        // Click vào Category Chip
-        const chip = e.target.closest(".category-chip");
-        if (chip) {
-          const category = chip.dataset.category;
-
-          // Cập nhật trạng thái active
-          document.querySelectorAll(".category-chip").forEach((btn) => {
-            btn.classList.remove("bg-white", "text-black", "hover:bg-gray-200");
-            btn.classList.add("bg-yt-hover", "text-white");
-          });
-          chip.classList.remove("bg-yt-hover", "text-white");
-          chip.classList.add("bg-white", "text-black", "hover:bg-gray-200");
-
-          // Logic lọc (Mô phỏng phía client vì hỗ trợ API hạn chế cho các chips cụ thể này)
-          const sectionTitle = document.querySelector("h2");
-          if (sectionTitle) {
-            if (category === "Mới phát hành") {
-              sectionTitle.textContent = "Mới phát hành";
-              // Giữ nguyên thứ tự ban đầu
+        // Handle Scroll Buttons
+        const scrollBtn = e.target.closest("[data-scroll]");
+        if (scrollBtn) {
+          const direction = scrollBtn.dataset.scroll;
+          const targetId = scrollBtn.dataset.target;
+          const container = document.getElementById(targetId);
+          if (container) {
+            const scrollAmount = container.clientWidth * 0.75;
+            if (direction === "left") {
+              container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
             } else {
-              sectionTitle.textContent = `${category} (Demo)`;
+              container.scrollBy({ left: scrollAmount, behavior: "smooth" });
             }
           }
         }
       });
     }
   } catch (error) {
-     console.error("Explore load error", error);
-     MainLayout(`
+    console.error("Explore load error", error);
+    MainLayout(
+      `
        <div class="text-center py-20 text-red-500">
            <h3 class="text-xl font-bold">Lỗi tải dữ liệu</h3>
            <p>${error.message}</p>
        </div>
-    `, router);
+    `,
+      router
+    );
   }
 };
 
-// Card đơn giản được sử dụng lại (Nên là một component chia sẻ trong app thực tế)
-const renderCard = (item) => {
-    const rawTitle = item.title || item.name || 'No Title';
-    const title = escapeHTML(rawTitle);
+// Updated renderCard to support 'album' vs 'video' variants
+const renderCard = (item, type = "album") => {
+  const rawTitle = item.title || item.name || "No Title";
+  const title = escapeHTML(rawTitle);
 
-    const rawSubtitle = Array.isArray(item.artists) 
-        ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
-        : '';
-    const subtitle = escapeHTML(rawSubtitle);
+  const rawSubtitle = Array.isArray(item.artists)
+    ? item.artists.map((a) => (typeof a === "string" ? a : a.name)).join(", ")
+    : "";
+  const subtitle = escapeHTML(rawSubtitle);
 
-    const image = (item.thumbnails && item.thumbnails[0]) || item.thumbnail || item.thumb || item.image || 'https://via.placeholder.com/300';
-    
-    return `
-      <div class="group cursor-pointer song-card" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
-         <div class="relative aspect-square mb-3 rounded overflow-hidden bg-gray-800">
+  const image =
+    (item.thumbnails && item.thumbnails[0]) ||
+    item.thumbnail ||
+    item.thumb ||
+    item.image ||
+    "https://via.placeholder.com/300";
+
+  // Layout specifics based on type
+  const isVideo = type === "video";
+  const widthClass = isVideo ? "w-80" : "w-48";
+  const aspectClass = isVideo ? "aspect-video" : "aspect-square";
+
+  return `
+      <div class="group cursor-pointer song-card snap-start flex-shrink-0 ${widthClass}" data-song='${JSON.stringify(
+    item
+  ).replace(/'/g, "&#39;")}'>
+         <div class="relative ${aspectClass} mb-3 rounded overflow-hidden bg-gray-800">
             <img src="${image}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                <button class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center pl-1 hover:scale-110 transition-transform">
-                   <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                   ${Icons.Play}
                </button>
             </div>
          </div>
@@ -220,26 +164,105 @@ const renderArtistCard = (artist) => {
     `;
 };
 
-
 const renderMoodCard = (item) => {
-    const rawTitle = item.title || item.name || 'Mood';
-    const title = escapeHTML(rawTitle);
-    
-    // Random gradient nếu không có ảnh, hoặc dùng logic cụ thể
-    const gradients = [
-        'from-purple-600 to-blue-600',
-        'from-red-500 to-orange-500',
-        'from-green-500 to-teal-500',
-        'from-pink-500 to-rose-500'
-    ];
-    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-    
-    return `
+  const rawTitle = item.title || item.name || "Mood";
+  const title = escapeHTML(rawTitle);
+
+  // Random gradient nếu không có ảnh, hoặc dùng logic cụ thể
+  const gradients = [
+    "from-purple-600 to-blue-600",
+    "from-red-500 to-orange-500",
+    "from-green-500 to-teal-500",
+    "from-pink-500 to-rose-500",
+  ];
+  const randomGradient =
+    gradients[Math.floor(Math.random() * gradients.length)];
+
+  return `
       <div class="group cursor-pointer relative h-32 rounded-lg overflow-hidden bg-gradient-to-br ${randomGradient} hover:scale-105 transition-transform duration-300">
          <div class="absolute inset-0 p-4 flex items-center justify-center text-center">
             <h3 class="text-xl font-bold text-white shadow-sm break-words">${title}</h3>
          </div>
-         <a href="/explore?category=${item.slug || ''}" class="absolute inset-0" data-navigo></a>
+         <a href="/explore?category=${
+           item.slug || ""
+         }" class="absolute inset-0" data-navigo></a>
       </div>
+    `;
+};
+
+// --- Helper Functions ---
+
+const renderTopNavigation = () => {
+  return `
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="/new_releases" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+                <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
+                    ${Icons.NewReleases}
+                </div>
+                <span class="text-lg font-bold">Bản phát hành mới</span>
+            </a>
+            <a href="/charts" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+                <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
+                    ${Icons.Charts}
+                </div>
+                <span class="text-lg font-bold">Bảng xếp hạng</span>
+            </a>
+            <a href="/moods_and_genres" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+                <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
+                    ${Icons.Moods}
+                </div>
+                <span class="text-lg font-bold">Tâm trạng và thể loại</span>
+            </a>
+         </div>
+    `;
+};
+
+const renderCarouselSection = ({
+  title,
+  id,
+  items,
+  type = "album",
+  hasMore = false,
+}) => {
+  if (!items || items.length === 0) return "";
+
+  return `
+         <section class="relative group/section">
+            <div class="flex items-end justify-between mb-4">
+               <div class="flex items-center gap-4">
+                   <h2 class="text-2xl font-bold">${title}</h2>
+               </div>
+               <div class="flex items-center gap-2">
+                   ${
+                     hasMore
+                       ? `<button class="text-xs font-bold uppercase tracking-wider border border-gray-700 hover:border-white px-3 py-1 rounded-full transition-colors mr-2">More</button>`
+                       : ""
+                   }
+                   <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors hover:bg-white/10" data-scroll="left" data-target="${id}">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                   </button>
+                   <button class="w-8 h-8 rounded-full border border-gray-700 hover:border-white flex items-center justify-center transition-colors hover:bg-white/10" data-scroll="right" data-target="${id}">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                   </button>
+               </div>
+            </div>
+            
+            <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 pb-4 snap-x scrollbar-styled">
+               ${items.map((item) => renderCard(item, type)).join("")}
+            </div>
+         </section>
+    `;
+};
+
+const renderGridSection = ({ title, items }) => {
+  if (!items || items.length === 0) return "";
+
+  return `
+         <section>
+             <h2 class="text-2xl font-bold mb-4">${title}</h2>
+             <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                ${items.map((item) => renderMoodCard(item)).join("")}
+             </div>
+         </section>
     `;
 };

@@ -2,6 +2,7 @@ import { apiClient } from '../utils/api';
 import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 import { Icons } from "../components/Icons";
+import { MoodGrid } from "../components/Moods";
 
 export const renderExplore = async (router) => {
   MainLayout(
@@ -46,7 +47,7 @@ export const renderExplore = async (router) => {
          })}
 
          ${renderCarouselSection({
-           title: "Video nhạc mới",
+           title: "Video âm nhạc mới",
            id: "explore-videos-carousel",
            items: videos.slice(0, 10),
            type: "video",
@@ -164,32 +165,6 @@ const renderArtistCard = (artist) => {
     `;
 };
 
-const renderMoodCard = (item) => {
-  const rawTitle = item.title || item.name || "Mood";
-  const title = escapeHTML(rawTitle);
-
-  // Random gradient nếu không có ảnh, hoặc dùng logic cụ thể
-  const gradients = [
-    "from-purple-600 to-blue-600",
-    "from-red-500 to-orange-500",
-    "from-green-500 to-teal-500",
-    "from-pink-500 to-rose-500",
-  ];
-  const randomGradient =
-    gradients[Math.floor(Math.random() * gradients.length)];
-
-  return `
-      <div class="group cursor-pointer relative h-32 rounded-lg overflow-hidden bg-gradient-to-br ${randomGradient} hover:scale-105 transition-transform duration-300">
-         <div class="absolute inset-0 p-4 flex items-center justify-center text-center">
-            <h3 class="text-xl font-bold text-white shadow-sm break-words">${title}</h3>
-         </div>
-         <a href="/explore?category=${
-           item.slug || ""
-         }" class="absolute inset-0" data-navigo></a>
-      </div>
-    `;
-};
-
 // --- Helper Functions ---
 
 const renderTopNavigation = () => {
@@ -260,9 +235,7 @@ const renderGridSection = ({ title, items }) => {
   return `
          <section>
              <h2 class="text-2xl font-bold mb-4">${title}</h2>
-             <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
-                ${items.map((item) => renderMoodCard(item)).join("")}
-             </div>
+             ${MoodGrid(items)}
          </section>
     `;
 };

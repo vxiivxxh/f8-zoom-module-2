@@ -60,12 +60,14 @@ export const apiClient = {
     return this.request(endpoint, { ...options, method: "DELETE" });
   },
 
-  getChartVideos(options = {}) {
-    return this.get("/charts/videos", options);
+  getChartVideos(params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/charts/videos?${qs}`, options);
   },
 
-  getTopArtists(options = {}) {
-    return this.get("/charts/top-artists", options);
+  getTopArtists(params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/charts/top-artists?${qs}`, options);
   },
 
   getMoods(options = {}) {

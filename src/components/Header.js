@@ -7,7 +7,7 @@ export const Header = () => {
   const initial = user && user.name ? user.name.charAt(0).toUpperCase() : 'G';
 
   return `
-    <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-8 mb-4">
+    <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-[113px] mb-4">
       <!-- Center: Search Bar -->
       <div class="flex items-center flex-1 max-w-xl">
         <div class="relative w-full group">
@@ -34,7 +34,9 @@ export const Header = () => {
           </button>
 
           <!-- User Profile -->
-         ${user ? `
+         ${
+           user
+             ? `
             <div id="profile-trigger" class="flex items-center gap-3 cursor-pointer relative select-none">
                 <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
                     ${initial}
@@ -48,9 +50,13 @@ export const Header = () => {
                      <button id="header-logout-btn" class="block w-full text-left px-4 py-2 text-sm text-yt-text-primary hover:bg-gray-700">Đăng xuất</button>
                 </div>
             </div>
-         ` : `
-            <a href="${import.meta.env.BASE_URL}login" class="text-sm font-medium text-yt-text-primary px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 transition-colors" data-navigo>Đăng nhập</a>
-         `}
+         `
+             : `
+            <a href="${
+              import.meta.env.BASE_URL
+            }login" class="text-sm font-medium text-yt-text-primary px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 transition-colors" data-navigo>Đăng nhập</a>
+         `
+         }
       </div>
     </header>
   `;

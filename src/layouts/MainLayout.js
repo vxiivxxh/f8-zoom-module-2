@@ -10,22 +10,22 @@ export const MainLayout = (content, router) => {
   
   const render = () => {
     app.innerHTML = `
-        <div class="flex h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative gap-16">
+        <div class="h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative grid grid-cols-[auto_1fr]">
             <div class="aurora-bg"></div>
             
-            <!-- Sidebar is now a flex item, not fixed -->
+            <!-- Sidebar: Grid item, width determined by class (w-sidebar or override) -->
             ${Sidebar()}
             
-            <!-- Main Content Wrapper: Flex column, takes remaining space -->
-            <div class="flex flex-col flex-1 min-w-0 transition-all relative z-10">
+            <!-- Main Content Wrapper: Vertical flow -->
+            <div class="flex flex-col min-w-0 transition-all relative z-10 h-full overflow-hidden">
                 ${Header()}
                 
-                <main class="flex-1 overflow-y-auto pb-player px-8 scroll-smooth scrollbar-none">
+                <main class="flex-1 overflow-y-auto pb-player px-[113px] scroll-smooth scrollbar-none flex flex-col gap-8">
                     ${content}
                 </main>
             </div>
             
-            ${playerStore.state.currentSong ? Player() : ''}
+            ${playerStore.state.currentSong ? Player() : ""}
         </div>
     `;
 

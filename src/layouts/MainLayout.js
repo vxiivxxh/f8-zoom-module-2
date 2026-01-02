@@ -60,9 +60,9 @@ export const MainLayout = (content, router, options = {}) => {
     const existingPlayer = document.querySelector(
       ".bg-yt-player.fixed.bottom-0"
     );
+
+    // Case 1: Player needs to be mounted (first time)
     if (state.currentSong && !existingPlayer) {
-      // Player xuất hiện lần đầu -> Re-render layout để điều chỉnh padding?
-      // Hoặc chỉ cần append Player.
       const appDiv = document.querySelector("#app > div");
       if (appDiv) {
         const tempDiv = document.createElement("div");
@@ -70,12 +70,31 @@ export const MainLayout = (content, router, options = {}) => {
         appDiv.appendChild(tempDiv.firstElementChild);
         setupPlayerEvents();
       }
-    } else if (state.currentSong && existingPlayer) {
-      // Cập nhật nội dung player hiện có
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = Player();
-      existingPlayer.replaceWith(tempDiv.firstElementChild);
-      setupPlayerEvents();
+      return;
+    }
+
+    // Case 2: Player exists. Update UI efficiently
+    if (existingPlayer) {
+      // If song changed completely, full re-render might be safest to swap Image/Title
+      // Checking title text content is a cheat-way to see if song changed.
+      const currentTitleEl = existingPlayer.querySelector("h3");
+      const currentTitle = currentTitleEl ? currentTitleEl.textContent : "";
+      const newTitle = state.currentSong
+        ? state.currentSong.title || state.currentSong.name
+        : "";
+
+      if (state.currentSong && currentTitle !== newTitle && newTitle) {
+        // Song changed -> Re-render
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = Player();
+        existingPlayer.replaceWith(tempDiv.firstElementChild);
+        setupPlayerEvents();
+      } else {
+        // Only state/progress update -> Granular Update
+        import("../components/Player").then(({ updatePlayerUI }) => {
+          updatePlayerUI(state);
+        });
+      }
     }
   });
 

@@ -173,7 +173,9 @@ const renderSongRow = (song, index) => {
 
             <!-- Image -->
             <div class="w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-800">
-                <img src="${image || 'https://via.placeholder.com/48'}" alt="${title}" class="w-full h-full object-cover">
+                <img src="${
+                  image || "https://via.placeholder.com/48"
+                }" alt="${title}" class="w-full h-full object-cover">
             </div>
 
             <!-- Info -->
@@ -184,18 +186,13 @@ const renderSongRow = (song, index) => {
 
             <!-- Album Name (Hidden on small screens) -->
              <div class="hidden md:block w-1/4 px-2 text-sm text-yt-text-secondary truncate">
-                ${escapeHTML(song.album?.title || '')}
+                ${escapeHTML(song.album?.title || "")}
             </div>
 
             <!-- Duration -->
             <div class="text-sm text-yt-text-secondary w-12 text-right font-variant-numeric">
                 ${duration}
             </div>
-            
-            <!-- Context Menu (Hover) -->
-             <button class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-             </button>
         </div>
     `;
 };

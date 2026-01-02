@@ -1,13 +1,22 @@
 import { playerStore } from '../store/playerStore';
 
 export const Player = () => {
-  const { currentSong, isPlaying, volume } = playerStore.state;
-  
-  if (!currentSong) return ''; // Or render empty state
+  const { currentSong, isPlaying, volume, currentTime, duration } =
+    playerStore.state;
 
-  const title = currentSong.title || currentSong.name || 'Unknown Title';
-  const artist = currentSong.artists ? currentSong.artists.map(a => a.name).join(', ') : 'Unknown Artist';
-  const image = currentSong.thumbnail || currentSong.image || 'https://via.placeholder.com/60';
+  if (!currentSong) return "";
+
+  const title = currentSong.title || currentSong.name || "Unknown Title";
+  const artist = currentSong.artists
+    ? currentSong.artists.map((a) => a.name).join(", ")
+    : "Unknown Artist";
+  const image =
+    (currentSong.thumbnails && currentSong.thumbnails[0]) ||
+    currentSong.thumbnail ||
+    currentSong.image ||
+    "https://via.placeholder.com/60";
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return `
     <div class="fixed bottom-0 left-0 right-0 h-player bg-yt-player border-t border-gray-800 flex items-center justify-between px-4 z-player">
@@ -31,9 +40,10 @@ export const Player = () => {
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
             </button>
             <button id="player-play" class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform">
-                ${isPlaying 
-                   ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' // Pause
-                   : '<svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' // Play
+                ${
+                  isPlaying
+                    ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' // Pause
+                    : '<svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' // Play
                 }
             </button>
             <button id="player-next" class="text-yt-text-secondary hover:text-white">
@@ -41,11 +51,11 @@ export const Player = () => {
             </button>
          </div>
          <div class="w-full flex items-center gap-3 text-xs text-yt-text-secondary font-mono">
-            <span>0:00</span>
-            <div class="flex-1 h-1 bg-gray-600 rounded-full cursor-pointer relative group">
-                <div class="absolute h-full bg-red-600 rounded-full group-hover:bg-red-500" style="width: 0%"></div>
+            <span class="time-current">${formatTime(currentTime)}</span>
+            <div id="player-progress-bar" class="flex-1 h-1 bg-gray-600 rounded-full cursor-pointer relative group">
+                <div class="absolute h-full bg-red-600 rounded-full group-hover:bg-red-500" style="width: ${progressPercent}%"></div>
             </div>
-            <span>3:45</span>
+            <span class="time-duration">${formatTime(duration)}</span>
          </div>
       </div>
 
@@ -54,36 +64,122 @@ export const Player = () => {
          <button id="player-toggle-video" class="text-yt-text-secondary hover:text-white" title="Toggle Video">
              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z"/></svg>
          </button>
-         <button class="text-yt-text-secondary hover:text-white">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+         <button id="player-mute" class="text-yt-text-secondary hover:text-white">
+            ${
+              playerStore.state.isMuted || playerStore.state.volume == 0
+                ? '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'
+                : '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>'
+            }
          </button>
-         <input type="range" min="0" max="100" value="${volume}" class="w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-white">
+         <input id="player-volume" type="range" min="0" max="100" value="${
+           playerStore.state.isMuted ? 0 : volume
+         }" class="w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-white">
       </div>
 
     </div>
   `;
 };
 
-// Bind events
-export const setupPlayerEvents = () => {
-    const playBtn = document.getElementById('player-play');
-    const nextBtn = document.getElementById('player-next');
-    const prevBtn = document.getElementById('player-prev');
-    const videoBtn = document.getElementById('player-toggle-video');
+// Formatting Helper
+const formatTime = (seconds) => {
+  if (!seconds || isNaN(seconds)) return "0:00";
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min}:${sec < 10 ? "0" + sec : sec}`;
+};
 
-    if (playBtn) playBtn.onclick = () => playerStore.togglePlay();
-    if (nextBtn) nextBtn.onclick = () => playerStore.next();
-    if (prevBtn) prevBtn.onclick = () => playerStore.prev();
-    
-    if (videoBtn) {
-        videoBtn.onclick = () => {
-            const container = document.getElementById('yt-player-container');
-            if (container) {
-                container.classList.toggle('hidden-video');
-                // Optional: Update button style to show active state
-                videoBtn.classList.toggle('text-white');
-                videoBtn.classList.toggle('text-yt-text-secondary');
-            }
-        };
-    }
+// Bind events & Subscribe
+export const setupPlayerEvents = () => {
+  const playBtn = document.getElementById("player-play");
+  const nextBtn = document.getElementById("player-next");
+  const prevBtn = document.getElementById("player-prev");
+  const videoBtn = document.getElementById("player-toggle-video");
+  const volumeSlider = document.getElementById("player-volume");
+  const progressBar = document.getElementById("player-progress-bar");
+  const muteBtn = document.getElementById("player-mute");
+
+  // DOM Elements to update (Closure cache)
+  const timeCurrent = document.querySelector("#player-controls .time-current");
+  const timeDuration = document.querySelector(
+    "#player-controls .time-duration"
+  );
+  const progressFill = document.querySelector("#player-progress-bar > div");
+  const playIconContainer = document.getElementById("player-play");
+  const muteIconContainer = document.getElementById("player-mute");
+  const volInput = document.getElementById("player-volume");
+
+  if (playBtn) playBtn.onclick = () => playerStore.togglePlay();
+  if (nextBtn) nextBtn.onclick = () => playerStore.next();
+  if (prevBtn) prevBtn.onclick = () => playerStore.prev();
+  if (muteBtn) muteBtn.onclick = () => playerStore.toggleMute();
+
+  if (volumeSlider) {
+    volumeSlider.oninput = (e) => playerStore.setVolume(e.target.value);
+  }
+
+  if (progressBar) {
+    progressBar.onclick = (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const percent = clickX / width;
+      const targetTime = playerStore.state.duration * percent;
+      playerStore.seek(targetTime);
+    };
+  }
+
+  if (videoBtn) {
+    videoBtn.onclick = () => {
+      const container = document.getElementById("yt-player-container");
+      if (container) {
+        container.classList.toggle("hidden-video");
+        videoBtn.classList.toggle("text-white");
+        videoBtn.classList.toggle("text-yt-text-secondary");
+      }
+    };
+  }
+};
+
+// Internal update function called by listener
+export const updatePlayerUI = (state) => {
+  // 1. Update Progress & Time
+  const currentEl = document.querySelector(".time-current");
+  const durationEl = document.querySelector(".time-duration");
+  const progressFill = document.querySelector("#player-progress-bar > div");
+
+  if (currentEl) currentEl.textContent = formatTime(state.currentTime);
+  if (durationEl) durationEl.textContent = formatTime(state.duration);
+
+  if (progressFill) {
+    const percent =
+      state.duration > 0 ? (state.currentTime / state.duration) * 100 : 0;
+    progressFill.style.width = `${percent}%`;
+  }
+
+  // 2. Play/Pause Icon
+  const playBtn = document.getElementById("player-play");
+  if (playBtn) {
+    const icon = state.isPlaying
+      ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+      : '<svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    if (playBtn.innerHTML.trim() !== icon) playBtn.innerHTML = icon;
+  }
+
+  // 3. Volume / Mute
+  const muteBtn = document.getElementById("player-mute");
+  if (muteBtn) {
+    const icon =
+      state.isMuted || state.volume == 0
+        ? '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'
+        : '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+    if (muteBtn.innerHTML.trim() !== icon) muteBtn.innerHTML = icon;
+  }
+
+  const volInput = document.getElementById("player-volume");
+  if (volInput) {
+    // Only update if not being dragged? Hard to detect.
+    // For now update to sync if mute toggled elsewhere
+    const targetVal = state.isMuted ? 0 : state.volume;
+    if (volInput.value != targetVal) volInput.value = targetVal;
+  }
 };

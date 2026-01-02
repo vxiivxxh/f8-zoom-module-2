@@ -117,18 +117,6 @@ body.sidebar-collapsed .hide-on-collapse {
     display: none !important;
 }
 
-/* Keep logo visible and clickable when sidebar is collapsed */
-body.sidebar-collapsed .logo-container {
-    display: flex !important;
-    pointer-events: auto !important;
-    position: relative !important;
-        z-index: 50 !important;
-}
-
-body.sidebar-collapsed .logo-container img {
-    height: 24px;
-    width: auto;
-}
 /* Adjust top container when collapsed to center logo */
 body.sidebar-collapsed aside>div:first-child {
     gap: 0.5rem !important;

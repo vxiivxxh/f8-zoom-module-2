@@ -145,9 +145,9 @@ export const renderHome = async (router) => {
             });
           } else {
             // Navigate action for Containers (Album, Playlist, Artist)
-            if (type === "album") router.navigate(`/album/${id}`);
-            else if (type === "playlist") router.navigate(`/playlist/${id}`);
-            else if (type === "artist") router.navigate(`/artist/${id}`);
+            if (type === "album") router.navigate(`album/${id}`);
+            else if (type === "playlist") router.navigate(`playlist/${id}`);
+            else if (type === "artist") router.navigate(`artist/${id}`);
           }
         }
       });

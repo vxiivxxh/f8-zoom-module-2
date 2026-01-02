@@ -91,7 +91,7 @@ export const renderLogin = (router) => {
     const result = await authStore.login(email, password);
 
     if (result.success) {
-      router.navigate('/');
+      router.navigate("");
     } else {
       errorDiv.textContent = result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
       errorDiv.classList.remove('hidden');

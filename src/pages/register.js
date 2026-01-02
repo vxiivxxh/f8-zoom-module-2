@@ -127,7 +127,7 @@ export const renderRegister = (router) => {
     const result = await authStore.register(name, email, password, confirmPassword);
 
     if (result.success) {
-      router.navigate('/');
+      router.navigate("");
     } else {
       errorDiv.textContent = result.error || 'Đăng ký thất bại.';
       errorDiv.classList.remove('hidden');

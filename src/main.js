@@ -45,14 +45,14 @@ router.on({
   },
   "/login": () => {
     if (authStore.isAuthenticated) {
-      router.navigate("/");
+      router.navigate("");
     } else {
       renderLogin(router);
     }
   },
   "/register": () => {
     if (authStore.isAuthenticated) {
-      router.navigate("/");
+      router.navigate("");
     } else {
       renderRegister(router);
     }

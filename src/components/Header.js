@@ -120,26 +120,26 @@ export const setupHeaderEvents = (router) => {
         });
 
         // Handle Enter Key
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const term = searchInput.value.trim();
-                if (term) {
-                    router.navigate(`/search?q=${encodeURIComponent(term)}`);
-                    suggestionsBox.classList.add('hidden');
-                    searchInput.blur();
-                }
+        searchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            const term = searchInput.value.trim();
+            if (term) {
+              router.navigate(`search?q=${encodeURIComponent(term)}`);
+              suggestionsBox.classList.add("hidden");
+              searchInput.blur();
             }
+          }
         });
 
         // Handle Click Suggestion
-        suggestionsBox.addEventListener('click', (e) => {
-            const item = e.target.closest('[data-suggestion]');
-            if (item) {
-                const term = item.dataset.suggestion;
-                searchInput.value = term; // Update input
-                router.navigate(`/search?q=${encodeURIComponent(term)}`);
-                suggestionsBox.classList.add('hidden');
-            }
+        suggestionsBox.addEventListener("click", (e) => {
+          const item = e.target.closest("[data-suggestion]");
+          if (item) {
+            const term = item.dataset.suggestion;
+            searchInput.value = term; // Update input
+            router.navigate(`search?q=${encodeURIComponent(term)}`);
+            suggestionsBox.classList.add("hidden");
+          }
         });
 
         // Close when clicking outside
@@ -160,7 +160,7 @@ export const setupHeaderEvents = (router) => {
             if (dropdown) dropdown.classList.add('hidden');
             
             await authStore.logout();
-            router.navigate('/login');
+            router.navigate("login");
         });
     }
 

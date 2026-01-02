@@ -123,23 +123,21 @@ export const renderExplore = async (router) => {
 
 // Render sections that appear at the top of the page
 const renderTopNavigation = () => {
-  const BASE_URL = import.meta.env.BASE_URL || "/";
-  
   return `
          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="${BASE_URL}new_releases" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="/new_releases" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.NewReleases}
                 </div>
                 <span class="text-lg font-bold">Bản phát hành mới</span>
             </a>
-            <a href="${BASE_URL}charts" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="/charts" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.Charts}
                 </div>
                 <span class="text-lg font-bold">Bảng xếp hạng</span>
             </a>
-            <a href="${BASE_URL}moods_and_genres" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="/moods_and_genres" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.Moods}
                 </div>

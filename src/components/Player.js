@@ -39,12 +39,13 @@ export const Player = () => {
             <button id="player-prev" class="text-yt-text-secondary hover:text-white">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
             </button>
-            <button id="player-play" class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform">
-                ${
-                  isPlaying
-                    ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' // Pause
-                    : '<svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' // Play
-                }
+            <button id="player-play" class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform relative" data-playing="${isPlaying}">
+                <svg class="pause-icon w-6 h-6 absolute" fill="currentColor" viewBox="0 0 24 24" style="display: ${
+                  isPlaying ? "block" : "none"
+                }"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg class="play-icon w-6 h-6 ml-1 absolute" fill="currentColor" viewBox="0 0 24 24" style="display: ${
+                  isPlaying ? "none" : "block"
+                }"><path d="M8 5v14l11-7z"/></svg>
             </button>
             <button id="player-next" class="text-yt-text-secondary hover:text-white">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
@@ -191,13 +192,24 @@ export const updatePlayerUI = (state) => {
     progressFill.style.width = `${percent}%`;
   }
 
-  // 2. Play/Pause Icon
+  // 2. Play/Pause Icon - Toggle visibility without innerHTML
   const playBtn = document.getElementById("player-play");
   if (playBtn) {
-    const icon = state.isPlaying
-      ? '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
-      : '<svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-    if (playBtn.innerHTML.trim() !== icon) playBtn.innerHTML = icon;
+    const pauseIcon = playBtn.querySelector(".pause-icon");
+    const playIcon = playBtn.querySelector(".play-icon");
+
+    if (pauseIcon && playIcon) {
+      if (state.isPlaying) {
+        pauseIcon.style.display = "block";
+        playIcon.style.display = "none";
+      } else {
+        pauseIcon.style.display = "none";
+        playIcon.style.display = "block";
+      }
+    }
+
+    // Update data attribute for state tracking
+    playBtn.setAttribute("data-playing", state.isPlaying);
   }
 
   // 3. Volume / Mute

@@ -124,10 +124,3 @@ body.sidebar-collapsed .logo-container {
     position: relative !important;
     z-index: 50 !important;
 }
-/* Adjust top container when collapsed to center logo */
-body.sidebar-collapsed aside>div:first-child {
-    gap: 0.5rem !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-    justify-content: center !important;
-}

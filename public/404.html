@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Music - Redirecting...</title>
+    <script>
+      // GitHub Pages SPA redirect solution
+      // When a user navigates directly to a route like /f8-zoom-module-2/explore,
+      // GitHub Pages returns this 404.html. We redirect to index.html with the path
+      // stored in sessionStorage so the app can restore the correct route.
+      
+      sessionStorage.redirect = location.href;
+      location.replace(location.origin + location.pathname.split('/').slice(0, -1).join('/') + '/index.html');
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>

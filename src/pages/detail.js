@@ -19,64 +19,93 @@ const renderDetail = async (router, type, id) => {
     `, router, { padding: 'px-8 py-8' });
 
     try {
-        let res;
-        if (type === 'album') {
-            res = await apiClient.getAlbumDetail(id);
+      let res;
+      if (type === "album") {
+        res = await apiClient.getAlbumDetail(id);
+      } else {
+        res = await apiClient.getPlaylistDetail(id);
+      }
+
+      console.log(`[Detail Page] Raw response for ${type} ${id}:`, res);
+
+      const data = res.data || res; // Fallback if data is at root
+      // data.id check ensures we actually have an item, not just a status object
+      if (!data || (!data.id && !data.title)) {
+        console.error("Invalid data received:", data);
+        throw new Error("Not found or invalid data");
+      }
+
+      // Debug Log
+      console.log(`[Detail Page] Extracted data:`, data);
+
+      // 3. Extract Data for UI
+      const isAlbum = type === "album";
+      const title = escapeHTML(data.title || data.name || "Untitled");
+      const description = escapeHTML(
+        data.description || data.sortDescription || ""
+      );
+      const image =
+        (data.thumbnails && data.thumbnails[0]) ||
+        data.thumbnail ||
+        data.image ||
+        "https://via.placeholder.com/300";
+
+      // Metadata construction
+      let artistNames = "Unknown Artist";
+      if (Array.isArray(data.artists) && data.artists.length > 0) {
+        artistNames = data.artists.map((a) => a.name).join(", ");
+      } else if (data.artistsNames) {
+        artistNames = data.artistsNames;
+      } else if (
+        data.tracks &&
+        data.tracks.length > 0 &&
+        data.tracks[0].artists &&
+        data.tracks[0].artists.length > 0
+      ) {
+        // Infer from first track if album artist is missing
+        artistNames = data.tracks[0].artists.map((a) => a.name).join(", ");
+      }
+
+      // Extract year from releaseDate (handles ISO format, slash format, or year-only)
+      let year = "2024"; // Default fallback
+      if (data.releaseDate) {
+        // If it's an ISO date (2020-11-23T17:00:00.000Z) or YYYY-MM-DD, extract first 4 chars
+        if (data.releaseDate.includes("-") || data.releaseDate.includes("T")) {
+          year = data.releaseDate.substring(0, 4);
+        } else if (data.releaseDate.includes("/")) {
+          // If it's DD/MM/YYYY or MM/DD/YYYY format
+          year = data.releaseDate.split("/").pop();
         } else {
-            res = await apiClient.getPlaylistDetail(id);
+          // If it's already just a year
+          year = data.releaseDate;
         }
+      }
 
-        console.log(`[Detail Page] Raw response for ${type} ${id}:`, res);
-        
-        const data = res.data || res; // Fallback if data is at root
-        // data.id check ensures we actually have an item, not just a status object
-        if (!data || (!data.id && !data.title)) {
-             console.error("Invalid data received:", data);
-             throw new Error('Not found or invalid data');
-        }
+      // Songs List
+      const songs = data.tracks || data.songs || data.song?.items || [];
 
-        // Debug Log
-        console.log(`[Detail Page] Extracted data:`, data);
+      const songCount =
+        data.songCount || (data.song ? data.song.total : songs.length);
 
-        // 3. Extract Data for UI
-        const isAlbum = type === 'album';
-        const title = escapeHTML(data.title || data.name || 'Untitled');
-        const description = escapeHTML(data.description || data.sortDescription || '');
-        const image = (data.thumbnails && data.thumbnails[0]) || data.thumbnail || data.image || 'https://via.placeholder.com/300';
-        
-        // Metadata construction
-        let artistNames = 'Unknown Artist';
-        if (Array.isArray(data.artists) && data.artists.length > 0) {
-            artistNames = data.artists.map(a => a.name).join(', ');
-        } else if (data.artistsNames) {
-            artistNames = data.artistsNames;
-        } else if (data.tracks && data.tracks.length > 0 && data.tracks[0].artists && data.tracks[0].artists.length > 0) {
-            // Infer from first track if album artist is missing
-            artistNames = data.tracks[0].artists.map(a => a.name).join(', ');
-        }
-        
-        const year = data.releaseDate ? (data.releaseDate.split('/').pop() || data.releaseDate) : '2024';
-        
-        // Songs List
-        const songs = data.tracks || data.songs || data.song?.items || [];
-        
-        const songCount = data.songCount || (data.song ? data.song.total : songs.length);
-        
-        // Duration formatting (seconds -> human readable)
-        const totalDuration = data.duration || (data.song ? data.song.totalDuration : 0);
-        const hours = Math.floor(totalDuration / 3600);
-        const minutes = Math.floor((totalDuration % 3600) / 60);
-        const durationStr = hours > 0 ? `${hours} giờ ${minutes} phút` : `${minutes} phút`;
+      // Duration formatting (seconds -> human readable)
+      const totalDuration =
+        data.duration || (data.song ? data.song.totalDuration : 0);
+      const hours = Math.floor(totalDuration / 3600);
+      const minutes = Math.floor((totalDuration % 3600) / 60);
+      const durationStr =
+        hours > 0 ? `${hours} giờ ${minutes} phút` : `${minutes} phút`;
 
-        const metadata = [
-            'YouTube Music',
-            year,
-            `${songCount} bài hát`,
-            durationStr
-        ].filter(Boolean).join(' • ');
+      const metadata = [
+        "YouTube Music",
+        year,
+        `${songCount} bài hát`,
+        durationStr,
+      ]
+        .filter(Boolean)
+        .join(" • ");
 
-        // 4. Render Content
-        const content = `
+      // 4. Render Content
+      const content = `
             <div class="flex flex-col lg:flex-row gap-8 relative items-start">
                 
                 <!-- Left Column: Sticky Info -->
@@ -136,11 +165,10 @@ const renderDetail = async (router, type, id) => {
             </div>
         `;
 
-        MainLayout(content, router, { padding: 'px-8 py-8' });
-        
-        // 5. Setup Events
-        setupDetailEvents({ songs, context: data });
+      MainLayout(content, router, { padding: "px-8 py-8" });
 
+      // 5. Setup Events
+      setupDetailEvents({ songs, context: data });
     } catch (error) {
         console.error("Detail load error", error);
         MainLayout(`

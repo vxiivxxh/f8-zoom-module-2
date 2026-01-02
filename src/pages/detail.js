@@ -84,7 +84,7 @@ const renderDetail = async (router, type, id) => {
                     
                     <!-- Cover Image -->
                     <div class="w-[260px] lg:w-[320px] aspect-square rounded shadow-2xl overflow-hidden mb-6 mx-auto">
-                        <img src="${image}" alt="${title}" class="w-full h-full object-cover">
+                        <img src="${image}" alt="${title}" class="w-full h-full object-cover left-column-cover-img">
                     </div>
 
                     <!-- Info -->
@@ -92,11 +92,17 @@ const renderDetail = async (router, type, id) => {
                         <h1 class="text-3xl lg:text-4xl font-black text-white leading-tight">${title}</h1>
                         
                         <div class="text-yt-text-secondary text-sm font-medium">
-                            <h2 class="text-white text-lg font-bold mb-1">${escapeHTML(artistNames)}</h2>
+                            <h2 class="text-white text-lg font-bold mb-1">${escapeHTML(
+                              artistNames
+                            )}</h2>
                             <p>${metadata}</p>
                         </div>
 
-                        ${description ? `<p class="text-xs text-yt-text-secondary line-clamp-3" title="${description}">${description}</p>` : ''}
+                        ${
+                          description
+                            ? `<p class="text-xs text-yt-text-secondary line-clamp-3" title="${description}">${description}</p>`
+                            : ""
+                        }
 
                         <!-- Action Bar -->
                         <div class="flex items-center justify-center gap-4 mt-6">
@@ -121,7 +127,9 @@ const renderDetail = async (router, type, id) => {
                 <!-- Right Column: Track List -->
                 <div class="flex-1 min-w-0 w-full">
                     <div class="flex flex-col">
-                        ${songs.map((song, index) => renderSongRow(song, index)).join('')}
+                        ${songs
+                          .map((song, index) => renderSongRow(song, index))
+                          .join("")}
                     </div>
                 </div>
 
@@ -196,24 +204,48 @@ const setupDetailEvents = ({ songs, context }) => {
     const main = document.querySelector('main');
     if (!main) return;
 
-    main.addEventListener('click', (e) => {
-        // Play Row
-        const row = e.target.closest('.song-row');
-        if (row) {
-            const index = parseInt(row.dataset.index, 10);
-            import('../store/playerStore').then(({ playerStore }) => {
-                playerStore.setQueue(songs, index);
-            });
-            return;
-        }
+    main.addEventListener("click", (e) => {
+      // Play Row
+      const row = e.target.closest(".song-row");
+      if (row) {
+        const index = parseInt(row.dataset.index, 10);
+        import("../store/playerStore").then(({ playerStore }) => {
+          playerStore.setQueue(songs, index);
+        });
+        return;
+      }
 
-        // Play All Button
-        const playAllBtn = e.target.closest('.play-all-btn');
-        if (playAllBtn && songs.length > 0) {
-            import('../store/playerStore').then(({ playerStore }) => {
-                playerStore.setQueue(songs, 0);
-            });
+      // Play All Button
+      const playAllBtn = e.target.closest(".play-all-btn");
+      if (playAllBtn && songs.length > 0) {
+        import("../store/playerStore").then(({ playerStore }) => {
+          playerStore.setQueue(songs, 0);
+        });
+      }
+    });
+
+    // Subscribe to Player updates to sync cover
+    import("../store/playerStore").then(({ playerStore }) => {
+      const coverImg = document.querySelector(".left-column-cover-img");
+
+      playerStore.subscribe((state) => {
+        // Check if we are still on the detail page (element exists)
+        if (!document.body.contains(coverImg)) return;
+
+        const currentSong = state.currentSong;
+        if (currentSong && coverImg) {
+          // Determine image to show
+          const newImage =
+            (currentSong.thumbnails && currentSong.thumbnails[0]) ||
+            currentSong.thumbnail ||
+            currentSong.image ||
+            currentSong.thumb;
+
+          if (newImage && coverImg.src !== newImage) {
+            coverImg.src = newImage;
+          }
         }
+      });
     });
 };
 

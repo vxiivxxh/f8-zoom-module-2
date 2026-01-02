@@ -51,17 +51,18 @@ const getAccentColor = (title) => {
     return FALLBACK_COLORS[Math.abs(hash) % FALLBACK_COLORS.length];
 };
 
-export const MoodCard = (item) => {
-    const title = item.title || item.name || 'Mood';
-    const accentColor = item.color || getAccentColor(title);
-    
-    // Fixed height (~56-64px -> h-16 is 64px, h-14 is 56px)
-    // Dark gray bg: bg-[#212121] or bg-gray-800
-    // Accent bar: w-1.5
-    
-    return `
-    <a href="/explore?category=${item.slug || ''}" 
-       class="group relative flex items-center h-12 w-[180px] bg-[#292929] hover:bg-[#3e3e3e] active:bg-[#222222] rounded-xl overflow-hidden transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white"
+export const MoodCard = (item, type = "category") => {
+  const title = item.title || item.name || "Mood";
+  const accentColor = item.color || getAccentColor(title);
+
+  // Fixed height (~56-64px -> h-16 is 64px, h-14 is 56px)
+  // Dark gray bg: bg-[#212121] or bg-gray-800
+  // Accent bar: w-1.5
+
+  return `
+    <div class="group relative flex items-center h-12 w-[180px] bg-[#292929] hover:bg-[#3e3e3e] active:bg-[#222222] rounded-xl overflow-hidden transition-colors outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-white mood-card"
+       data-type="${type}"
+       data-slug="${item.slug || ""}"
        data-navigo>
         
         <!-- Accent Bar on Left -->
@@ -73,19 +74,17 @@ export const MoodCard = (item) => {
                 ${title}
             </span>
         </div>
-        
-        <!-- Optional: Right Arrow or Icon (Hidden by default, shown on hover?) -> YouTube Music doesn't usually show one, just the bar -->
-    </a>
+    </div>
     `;
 };
 
-export const MoodGrid = (items) => {
-    if (!items || items.length === 0) return '';
-    
-    // Grid with fixed 180px columns
-    return `
+export const MoodGrid = (items, type = "category") => {
+  if (!items || items.length === 0) return "";
+
+  // Grid with fixed 180px columns
+  return `
      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, 180px);">
-        ${items.map(MoodCard).join("")}
+        ${items.map((item) => MoodCard(item, type)).join("")}
      </div>
     `;
 };

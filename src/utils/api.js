@@ -138,4 +138,38 @@ export const apiClient = {
     const qs = new URLSearchParams(params).toString();
     return this.get(`/lines?${qs}`, options);
   },
+
+  getMoodDetail(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/moods/${slug}?${qs}`, options);
+  },
+
+  getCategoryDetail(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/categories/${slug}?${qs}`, options);
+  },
+
+  getLineDetail(slug, options = {}) {
+    return this.get(`/lines/${slug}`, options);
+  },
+
+  getLineSongs(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/lines/${slug}/songs?${qs}`, options);
+  },
+
+  getLinePlaylists(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/lines/${slug}/playlists?${qs}`, options);
+  },
+
+  getLineAlbums(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/lines/${slug}/albums?${qs}`, options);
+  },
+
+  getLineVideos(slug, params = {}, options = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/lines/${slug}/videos?${qs}`, options);
+  },
 };

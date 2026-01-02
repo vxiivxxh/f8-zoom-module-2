@@ -12,6 +12,9 @@ import { renderCharts } from "./pages/charts";
 import { renderMoodsGenres } from "./pages/moods_genres";
 import { renderAlbumDetail, renderPlaylistDetail } from "./pages/detail";
 import { renderVideo } from "./pages/video";
+import { renderMoodDetail } from "./pages/moodDetail";
+import { renderCategoryDetail } from "./pages/categoryDetail";
+import { renderLineDetail } from "./pages/lineDetail";
 
 const router = new Navigo(import.meta.env.BASE_URL || "/");
 
@@ -46,6 +49,15 @@ router.on({
   },
   "/video/:id": (match) => {
     renderVideo(router, match);
+  },
+  "/mood/:slug": (match) => {
+    renderMoodDetail(router, match);
+  },
+  "/category/:slug": (match) => {
+    renderCategoryDetail(router, match);
+  },
+  "/line/:slug": (match) => {
+    renderLineDetail(router, match);
   },
   "/artist/:id": (match) => {
     // TODO: Implement artist detail

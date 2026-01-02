@@ -25,17 +25,36 @@ export const renderMoodsGenres = async (router) => {
        <div class="space-y-12">
          <section>
              <h2 class="text-2xl font-bold mb-4">Tâm trạng và khoảnh khắc</h2>
-             ${MoodGrid(categories)}
+             ${MoodGrid(categories, "category")}
          </section>
 
          <section>
              <h2 class="text-2xl font-bold mb-4">Dòng nhạc</h2>
-             ${MoodGrid(lines)}
+             ${MoodGrid(lines, "line")}
          </section>
        </div>
     `;
 
     MainLayout(content, router);
+
+    // Event Delegation
+    const main = document.querySelector("main");
+    if (main) {
+      main.addEventListener("click", (e) => {
+        const card = e.target.closest(".mood-card");
+        if (card) {
+          e.preventDefault();
+          const slug = card.dataset.slug;
+          const type = card.dataset.type;
+
+          if (type === "category") {
+            router.navigate(`/category/${slug}`);
+          } else if (type === "line") {
+            router.navigate(`/line/${slug}`);
+          }
+        }
+      });
+    }
   } catch (error) {
     console.error("Moods & Genres load error", error);
     MainLayout(

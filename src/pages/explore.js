@@ -83,6 +83,9 @@ export const renderExplore = async (router) => {
             if (type === "album") router.navigate(`album/${id}`);
             else if (type === "playlist") router.navigate(`playlist/${id}`);
             else if (type === "artist") router.navigate(`artist/${id}`);
+            else if (type === "mood") router.navigate(`mood/${slug}`);
+            else if (type === "category") router.navigate(`category/${slug}`);
+            else if (type === "line") router.navigate(`line/${slug}`);
           }
         }
 
@@ -99,6 +102,23 @@ export const renderExplore = async (router) => {
             } else {
               container.scrollBy({ left: scrollAmount, behavior: "smooth" });
             }
+          }
+        }
+
+        // Handle Mood Card Clicks (from MoodGrid)
+        const moodCard = e.target.closest(".mood-card");
+        if (moodCard) {
+          e.preventDefault();
+          const type = moodCard.dataset.type; // 'category' or 'line' usually
+          const slug = moodCard.dataset.slug;
+
+          if (type === "category") {
+            router.navigate(`category/${slug}`);
+          } else if (type === "line") {
+            router.navigate(`line/${slug}`);
+          } else if (type === "mood") {
+            // Fallback if type is mood (e.g. from homepage if it used this component, but it doesn't anymore)
+            router.navigate(`mood/${slug}`);
           }
         }
       });

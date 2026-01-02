@@ -124,11 +124,6 @@ body.sidebar-collapsed .logo-container {
     position: relative !important;
     z-index: 50 !important;
 }
-
-body.sidebar-collapsed .logo-container img {
-    height: 24px;
-    width: auto;
-}
 /* Adjust top container when collapsed to center logo */
 body.sidebar-collapsed aside>div:first-child {
     gap: 0.5rem !important;

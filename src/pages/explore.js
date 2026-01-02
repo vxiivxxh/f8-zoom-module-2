@@ -82,9 +82,9 @@ export const renderExplore = async (router) => {
             });
           } else {
             // Navigate action for Containers (Album, Playlist, Artist)
-            if (type === "album") router.navigate(`/album/${id}`);
-            else if (type === "playlist") router.navigate(`/playlist/${id}`);
-            else if (type === "artist") router.navigate(`/artist/${id}`);
+            if (type === "album") router.navigate(`album/${id}`);
+            else if (type === "playlist") router.navigate(`playlist/${id}`);
+            else if (type === "artist") router.navigate(`artist/${id}`);
           }
         }
 
@@ -124,19 +124,19 @@ export const renderExplore = async (router) => {
 const renderTopNavigation = () => {
   return `
          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="/new_releases" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="new_releases" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.NewReleases}
                 </div>
                 <span class="text-lg font-bold">Bản phát hành mới</span>
             </a>
-            <a href="/charts" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="charts" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.Charts}
                 </div>
                 <span class="text-lg font-bold">Bảng xếp hạng</span>
             </a>
-            <a href="/moods_and_genres" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
+            <a href="moods_and_genres" class="flex items-center p-4 bg-yt-hover rounded-lg hover:bg-gray-700 transition-colors group" data-navigo>
                 <div class="mr-4 text-gray-400 group-hover:text-white transition-colors">
                     ${Icons.Moods}
                 </div>

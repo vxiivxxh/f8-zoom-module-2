@@ -1,5 +1,6 @@
 import { Card } from "./Card";
 
+
 export const Section = (title, items, id, type) => {
   return `
       <section class="mb-10">
@@ -23,7 +24,14 @@ export const Section = (title, items, id, type) => {
               }
           </div>
           <div id="${id}" class="flex overflow-x-auto gap-6 pb-4 scrollbar-styled scroll-smooth snap-x">
-              ${items.map((item) => Card(item, { type })).join("")}
+              ${items
+                .map((item) => {
+                  if (type === "video" || item.type === "video") {
+                    return Card(item, { type: "video" });
+                  }
+                  return Card(item, { type });
+                })
+                .join("")}
           </div>
       </section>
     `;

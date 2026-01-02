@@ -137,10 +137,7 @@ export const renderHome = async (router) => {
               playerStore.play(itemData);
             });
           } else if (type === "video") {
-            // Video plays for now
-            import("../store/playerStore").then(({ playerStore }) => {
-              playerStore.play(itemData);
-            });
+            router.navigate(`video/${id}`);
           } else {
             // Navigate action for Containers (Album, Playlist, Artist)
             if (type === "album") router.navigate(`album/${id}`);

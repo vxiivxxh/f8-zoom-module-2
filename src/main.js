@@ -11,6 +11,7 @@ import { renderNewReleases } from "./pages/new_releases";
 import { renderCharts } from "./pages/charts";
 import { renderMoodsGenres } from "./pages/moods_genres";
 import { renderAlbumDetail, renderPlaylistDetail } from "./pages/detail";
+import { renderVideo } from "./pages/video";
 
 const router = new Navigo(import.meta.env.BASE_URL || "/");
 
@@ -42,6 +43,13 @@ router.on({
   },
   "/playlist/:id": (match) => {
     renderPlaylistDetail(router, match.data);
+  },
+  "/video/:id": (match) => {
+    renderVideo(router, match);
+  },
+  "/artist/:id": (match) => {
+    // TODO: Implement artist detail
+    console.log("Artist detail not implemented", match);
   },
   "/login": () => {
     if (authStore.isAuthenticated) {

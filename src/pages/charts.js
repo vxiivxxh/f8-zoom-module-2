@@ -2,6 +2,7 @@ import { apiClient } from '../utils/api';
 import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 import { Icons } from "../components/Icons";
+import { Card } from "../components/Card";
 
 let state = {
   country: { code: "VN", name: "Vietnam" }, // Default
@@ -105,7 +106,9 @@ const renderContent = (router) => {
              
              <div id="video-charts-carousel" class="flex overflow-x-auto scroll-smooth gap-4 pb-4 snap-x scrollbar-none">
                  ${state.videos
-                   .map((item, index) => renderVideoCard(item, index + 1))
+                   .map((item, index) =>
+                     Card({ ...item, rank: index + 1 }, { type: "video" })
+                   )
                    .join("")}
              </div>
          </section>
@@ -162,48 +165,6 @@ const renderCountrySelector = () => {
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             </div>
         </div>
-    `;
-};
-
-const renderVideoCard = (item, rank) => {
-  const rawTitle = item.title || item.name || "No Title";
-  const title = escapeHTML(rawTitle);
-
-  const rawSubtitle = Array.isArray(item.artists)
-    ? item.artists.map((a) => (typeof a === "string" ? a : a.name)).join(", ")
-    : "";
-  const subtitle = escapeHTML(rawSubtitle);
-
-  const image =
-    (item.thumbnails && item.thumbnails[0]) ||
-    item.thumbnail ||
-    item.thumb ||
-    item.image ||
-    "https://via.placeholder.com/320x180";
-
-  return `
-    <div class="group relative flex-shrink-0 w-80 snap-start cursor-pointer song-card" data-song='${JSON.stringify(
-      item
-    ).replace(/'/g, "&#39;")}' >
-         <!-- Rank Badge -->
-        <div class="absolute top-2 left-2 z-10 w-8 h-8 rounded bg-black/60 backdrop-blur-sm flex items-center justify-center font-bold text-white border border-white/10">
-            ${rank}
-        </div>
-
-        <div class="relative aspect-video rounded-lg overflow-hidden mb-3 group-hover:shadow-[0_4px_20px_rgba(255,255,255,0.1)] transition-shadow">
-            <img src="${image}" alt="${title}" class="w-full h-full object-cover">
-            
-            <!-- Hover Overlay -->
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                 <button class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                    ${Icons.Play}
-                 </button>
-            </div>
-        </div>
-
-        <h3 class="font-medium text-white truncate pr-2" title="${title}">${title}</h3>
-        <p class="text-sm text-gray-400 truncate" title="${subtitle}">${subtitle}</p>
-    </div>
     `;
 };
 
@@ -363,7 +324,16 @@ const attachEventListeners = (router) => {
 
   // Event Delegation
   main.addEventListener("click", (e) => {
-    // Play Video
+    // Navigate Video
+    const videoCard = e.target.closest(".card-item[data-type='video']");
+    if (videoCard) {
+      e.preventDefault();
+      const id = videoCard.dataset.id;
+      router.navigate(`/video/${id}`);
+      return;
+    }
+
+    // Play Song (if any other card type logic exists here, mostly just artists and videos on this page)
     const songCard = e.target.closest(".song-card");
     if (songCard) {
       const songData = JSON.parse(songCard.dataset.song);

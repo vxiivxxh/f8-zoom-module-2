@@ -286,7 +286,9 @@ export const setupSearchEvents = (router, query) => {
         const playBtn = e.target.closest(".play-btn");
         if (playBtn) {
           e.stopPropagation(); // prevent navigation
-          if (type === "song" || type === "video" || type === "album") {
+          if (type === "video") {
+            router.navigate(`video/${id}`);
+          } else if (type === "song" || type === "album") {
             import("../store/playerStore").then(({ playerStore }) => {
               playerStore.play(itemData);
             });
@@ -298,8 +300,9 @@ export const setupSearchEvents = (router, query) => {
         if (type === "album") router.navigate(`album/${id}`);
         else if (type === "playlist") router.navigate(`playlist/${id}`);
         else if (type === "artist") router.navigate(`artist/${id}`);
-        else if (type === "song" || type === "video") {
-          // Click on card body for song/video plays it
+        else if (type === "video") router.navigate(`video/${id}`);
+        else if (type === "song") {
+          // Click on card body for nice song plays it
           import("../store/playerStore").then(({ playerStore }) => {
             playerStore.play(itemData);
           });

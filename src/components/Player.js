@@ -98,45 +98,80 @@ export const setupPlayerEvents = () => {
   const progressBar = document.getElementById("player-progress-bar");
   const muteBtn = document.getElementById("player-mute");
 
-  // DOM Elements to update (Closure cache)
-  const timeCurrent = document.querySelector("#player-controls .time-current");
-  const timeDuration = document.querySelector(
-    "#player-controls .time-duration"
-  );
-  const progressFill = document.querySelector("#player-progress-bar > div");
-  const playIconContainer = document.getElementById("player-play");
-  const muteIconContainer = document.getElementById("player-mute");
-  const volInput = document.getElementById("player-volume");
+  // Use event delegation on the player wrapper for more reliable event handling
+  // This prevents handlers from being lost when button innerHTML is replaced
+  const playerWrapper = document.querySelector(".fixed.bottom-0");
 
-  if (playBtn) playBtn.onclick = () => playerStore.togglePlay();
-  if (nextBtn) nextBtn.onclick = () => playerStore.next();
-  if (prevBtn) prevBtn.onclick = () => playerStore.prev();
-  if (muteBtn) muteBtn.onclick = () => playerStore.toggleMute();
+  if (playerWrapper) {
+    playerWrapper.addEventListener("click", (e) => {
+      // Play/Pause button
+      const playBtn = e.target.closest("#player-play");
+      if (playBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        playerStore.togglePlay();
+        return;
+      }
+
+      // Next button
+      const nextBtn = e.target.closest("#player-next");
+      if (nextBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        playerStore.next();
+        return;
+      }
+
+      // Previous button
+      const prevBtn = e.target.closest("#player-prev");
+      if (prevBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        playerStore.prev();
+        return;
+      }
+
+      // Mute button
+      const muteButton = e.target.closest("#player-mute");
+      if (muteButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        playerStore.toggleMute();
+        return;
+      }
+
+      // Video toggle button
+      const videoBtn = e.target.closest("#player-toggle-video");
+      if (videoBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const container = document.getElementById("yt-player-container");
+        if (container) {
+          container.classList.toggle("hidden-video");
+          videoBtn.classList.toggle("text-white");
+          videoBtn.classList.toggle("text-yt-text-secondary");
+        }
+        return;
+      }
+
+      // Progress bar
+      const progressClick = e.target.closest("#player-progress-bar");
+      if (progressClick && !e.target.closest("input")) {
+        const rect = progressClick.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = rect.width;
+        const percent = clickX / width;
+        const targetTime = playerStore.state.duration * percent;
+        playerStore.seek(targetTime);
+        return;
+      }
+    });
+  }
 
   if (volumeSlider) {
-    volumeSlider.oninput = (e) => playerStore.setVolume(e.target.value);
-  }
-
-  if (progressBar) {
-    progressBar.onclick = (e) => {
-      const rect = progressBar.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const width = rect.width;
-      const percent = clickX / width;
-      const targetTime = playerStore.state.duration * percent;
-      playerStore.seek(targetTime);
-    };
-  }
-
-  if (videoBtn) {
-    videoBtn.onclick = () => {
-      const container = document.getElementById("yt-player-container");
-      if (container) {
-        container.classList.toggle("hidden-video");
-        videoBtn.classList.toggle("text-white");
-        videoBtn.classList.toggle("text-yt-text-secondary");
-      }
-    };
+    volumeSlider.addEventListener("input", (e) => {
+      playerStore.setVolume(e.target.value);
+    });
   }
 };
 

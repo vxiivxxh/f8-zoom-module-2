@@ -10,8 +10,9 @@ import { renderSearch } from './pages/search';
 import { renderNewReleases } from "./pages/new_releases";
 import { renderCharts } from "./pages/charts";
 import { renderMoodsGenres } from "./pages/moods_genres";
+import { renderAlbumDetail, renderPlaylistDetail } from "./pages/detail";
 
-const router = new Navigo(import.meta.env.BASE_URL || '/');
+const router = new Navigo(import.meta.env.BASE_URL || "/");
 
 // Định nghĩa Route
 router.on({
@@ -35,6 +36,12 @@ router.on({
   },
   "/search": () => {
     renderSearch(router);
+  },
+  "/album/:id": (match) => {
+    renderAlbumDetail(router, match.data);
+  },
+  "/playlist/:id": (match) => {
+    renderPlaylistDetail(router, match.data);
   },
   "/login": () => {
     if (authStore.isAuthenticated) {

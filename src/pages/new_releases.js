@@ -1,6 +1,6 @@
-import { apiClient } from '../utils/api';
-import { escapeHTML } from '../utils/security';
-import { MainLayout } from '../layouts/MainLayout';
+import { apiClient } from "../utils/api";
+import { MainLayout } from "../layouts/MainLayout";
+import { Card } from "../components/Card";
 import { Icons } from "../components/Icons";
 
 export const renderNewReleases = async (router) => {
@@ -55,16 +55,29 @@ export const renderNewReleases = async (router) => {
     const main = document.querySelector("main");
     if (main) {
       main.addEventListener("click", (e) => {
-        // Play song
-        const card = e.target.closest(".song-card");
+        // Priority: Play Button -> Play Song
+        const playBtn = e.target.closest(".play-btn");
+        const card = e.target.closest(".card-item");
+
         if (card) {
-          try {
-            const songData = JSON.parse(card.dataset.song);
+          const type = card.dataset.type;
+          const id = card.dataset.id;
+          const itemData = JSON.parse(card.dataset.item || "{}");
+
+          if (type === "song") {
+            // Play action
             import("../store/playerStore").then(({ playerStore }) => {
-              playerStore.play(songData);
+              playerStore.play(itemData);
             });
-          } catch (err) {
-            console.error("Failed to play song", err);
+          } else if (type === "video") {
+            import("../store/playerStore").then(({ playerStore }) => {
+              playerStore.play(itemData);
+            });
+          } else {
+            // Navigate action for Containers (Album, Playlist, Artist)
+            if (type === "album") router.navigate(`/album/${id}`);
+            else if (type === "playlist") router.navigate(`/playlist/${id}`);
+            else if (type === "artist") router.navigate(`/artist/${id}`);
           }
         }
 
@@ -133,47 +146,8 @@ const renderCarouselSection = ({
             </div>
             
             <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 pb-4 snap-x scrollbar-styled">
-               ${items.map((item) => renderCard(item, type)).join("")}
+               ${items.map((item) => Card(item, { type })).join("")}
             </div>
          </section>
-    `;
-};
-
-const renderCard = (item, type = "album") => {
-  const rawTitle = item.title || item.name || "No Title";
-  const title = escapeHTML(rawTitle);
-
-  const rawSubtitle = Array.isArray(item.artists)
-    ? item.artists.map((a) => (typeof a === "string" ? a : a.name)).join(", ")
-    : "";
-  const subtitle = escapeHTML(rawSubtitle);
-
-  const image =
-    (item.thumbnails && item.thumbnails[0]) ||
-    item.thumbnail ||
-    item.thumb ||
-    item.image ||
-    "https://via.placeholder.com/300";
-
-  // Layout specifics based on type
-  const isVideo = type === "video";
-  const widthClass = isVideo ? "w-80" : "w-48";
-  const aspectClass = isVideo ? "aspect-video" : "aspect-square";
-
-  return `
-      <div class="group cursor-pointer song-card snap-start flex-shrink-0 ${widthClass}" data-song='${JSON.stringify(
-    item
-  ).replace(/'/g, "&#39;")}'>
-         <div class="relative ${aspectClass} mb-3 rounded overflow-hidden bg-gray-800">
-            <img src="${image}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-               <button class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center pl-1 hover:scale-110 transition-transform">
-                   ${Icons.Play}
-               </button>
-            </div>
-         </div>
-         <h3 class="font-medium text-white truncate hover:underline" title="${title}">${title}</h3>
-         <p class="text-sm text-yt-text-secondary truncate" title="${subtitle}">${subtitle}</p>
-      </div>
     `;
 };

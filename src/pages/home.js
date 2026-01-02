@@ -2,14 +2,18 @@ import { apiClient } from '../utils/api';
 import { escapeHTML } from '../utils/security';
 import { MainLayout } from '../layouts/MainLayout';
 import { authStore } from '../store/authStore';
+import { Card } from "../components/Card";
 
 export const renderHome = async (router) => {
   // Hiển thị trạng thái Loading sử dụng Layout
-  MainLayout(`
+  MainLayout(
+    `
       <div class="flex items-center justify-center h-64">
           <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
-  `, router);
+  `,
+    router
+  );
 
   try {
     // Chuẩn bị các promise song song
@@ -115,20 +119,35 @@ export const renderHome = async (router) => {
 
     MainLayout(content, router);
 
-    // Event Delegation cho Song Cards & Nút cuộn
+    // Event Delegation cho Cards
     const main = document.querySelector("main");
     if (main) {
-      // Xử lý click vào Card
       main.addEventListener("click", (e) => {
-        const card = e.target.closest(".song-card");
+        // Priority: Play Button -> Play Song
+        const playBtn = e.target.closest(".play-btn");
+        const card = e.target.closest(".card-item");
+
         if (card) {
-          try {
-            const songData = JSON.parse(card.dataset.song);
+          const type = card.dataset.type;
+          const id = card.dataset.id;
+          const itemData = JSON.parse(card.dataset.item || "{}");
+
+          // Only Play if explicitly a Song or Video (with play button)
+          // For Albums/Playlists/Artists, we ALWAYS navigate, even if play button is clicked
+          if (type === "song") {
             import("../store/playerStore").then(({ playerStore }) => {
-              playerStore.play(songData);
+              playerStore.play(itemData);
             });
-          } catch (err) {
-            console.error("Failed to play song", err);
+          } else if (type === "video") {
+            // Video plays for now
+            import("../store/playerStore").then(({ playerStore }) => {
+              playerStore.play(itemData);
+            });
+          } else {
+            // Navigate action for Containers (Album, Playlist, Artist)
+            if (type === "album") router.navigate(`/album/${id}`);
+            else if (type === "playlist") router.navigate(`/playlist/${id}`);
+            else if (type === "artist") router.navigate(`/artist/${id}`);
           }
         }
       });
@@ -154,25 +173,32 @@ export const renderHome = async (router) => {
     }
   } catch (error) {
     console.error("Home load error", error);
-    MainLayout(`
+    MainLayout(
+      `
        <div class="text-center py-20 text-red-500">
            <h3 class="text-xl font-bold">Đã có lỗi xảy ra</h3>
            <p>${error.message}</p>
            <button class="mt-4 px-4 py-2 bg-white text-black rounded-full" onclick="location.reload()">Thử lại</button>
        </div>
-    `, router);
+    `,
+      router
+    );
   }
 };
 
-// 
-const renderSection = (title, items, id, subtitle = '') => {
-    const displayItems = items.slice(0, 12);
+//
+const renderSection = (title, items, id, subtitle = "") => {
+  const displayItems = items.slice(0, 12);
 
-    return `
+  return `
     <section>
         <div class="flex items-end justify-between mb-4">
             <div>
-                ${subtitle ? `<p class="text-sm font-medium text-yt-text-secondary uppercase tracking-wider mb-1">${subtitle}</p>` : ''}
+                ${
+                  subtitle
+                    ? `<p class="text-sm font-medium text-yt-text-secondary uppercase tracking-wider mb-1">${subtitle}</p>`
+                    : ""
+                }
                 <h2 class="text-2xl font-bold leading-tight">${title}</h2>
             </div>
             <div class="flex items-center gap-2">
@@ -187,36 +213,8 @@ const renderSection = (title, items, id, subtitle = '') => {
             </div>
         </div>
         <div id="${id}" class="flex overflow-x-auto scroll-smooth gap-6 pb-4 snap-x scrollbar-styled">
-            ${displayItems.map((item) => `<div>${renderCard(item)}</div>`).join('')}
+            ${displayItems.map((item) => Card(item)).join("")}
         </div>
     </section>
-    `;
-};
-
-//
-const renderCard = (item) => {
-    const rawTitle = item.title || item.name || 'Không có tiêu đề';
-    const title = escapeHTML(rawTitle);
-
-    const rawSubtitle = Array.isArray(item.artists) 
-        ? item.artists.map(a => typeof a === 'string' ? a : a.name).join(', ') 
-        : (item.description || '');
-    const subtitle = escapeHTML(rawSubtitle);
-        
-    const image = item.thumbnails?.[0] || item.thumbnail || item.image || 'https://via.placeholder.com/300';
-    
-    return `
-      <div class="flex-shrink-0 w-48 group cursor-pointer song-card snap-start" data-song='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
-         <div class="relative aspect-square mb-3 rounded overflow-hidden bg-gray-800">
-            <img src="${image}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-               <button class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center pl-1 hover:scale-110 transition-transform">
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-               </button>
-            </div>
-         </div>
-         <h3 class="font-medium text-white truncate group-hover:underline" title="${title}">${title}</h3>
-         <p class="text-sm text-yt-text-secondary truncate" title="${subtitle}">${subtitle}</p>
-      </div>
     `;
 };

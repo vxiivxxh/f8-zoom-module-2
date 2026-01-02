@@ -102,9 +102,9 @@ class PlayerStore {
   play(song) {
     // Nếu đang chơi cùng một bài, chỉ cần resume
     if (this.state.currentSong && this.state.currentSong.id === song.id) {
-       if (this.player && typeof this.player.playVideo === 'function') {
-           this.player.playVideo();
-       }
+      if (this.player && typeof this.player.playVideo === "function") {
+        this.player.playVideo();
+      }
       this.setState({ isPlaying: true });
       return;
     }
@@ -116,25 +116,44 @@ class PlayerStore {
       currentTime: 0,
       duration: song.duration || 0,
     });
-    
-    if (this.player && typeof this.player.loadVideoById === 'function') {
-        const videoId = song.id; 
-        this.player.loadVideoById(videoId);
+
+    if (this.player && typeof this.player.loadVideoById === "function") {
+      const videoId = song.id;
+      this.player.loadVideoById(videoId);
     }
 
-    // Logic hàng đợi
+    // Logic hàng đợi: Nếu queue rỗng, thêm bài này vào.
+    // Nếu playing từ Context (setQueue), queue đã được set trước đó.
+    // Nếu play lẻ (Search), thêm vào cuối hoặc nhảy tới nó.
     if (this.state.queue.length === 0) {
-        this.state.queue = [song];
-        this.state.currentIndex = 0;
+      this.state.queue = [song];
+      this.state.currentIndex = 0;
     } else {
-        const index = this.state.queue.findIndex(s => s.id === song.id);
-        if (index === -1) {
-             this.state.queue.push(song);
-             this.setState({ currentIndex: this.state.queue.length - 1});
-        } else {
-             this.setState({ currentIndex: index });
-        }
+      // Kiểm tra xem bài hát đã có trong queue chưa
+      const index = this.state.queue.findIndex((s) => s.id === song.id);
+      if (index === -1) {
+        // Chưa có -> Thêm vào cuối (Up Next mechanism could be better)
+        this.state.queue.push(song);
+        this.setState({ currentIndex: this.state.queue.length - 1 });
+      } else {
+        // Đã có -> Nhảy tới
+        this.setState({ currentIndex: index });
+      }
     }
+  }
+
+  setQueue(songs, startIndex = 0) {
+      this.state.queue = songs;
+      this.state.currentIndex = startIndex;
+      const song = songs[startIndex];
+      if (song) {
+          // Reset currentSong để play() nhận diện là bài mới nếu cần, 
+          // nhưng play logic check ID. Nếu ID trùng thì resume.
+          // Ở đây mình muốn force play context mới.
+          // Để đơn giản, gọi play(song).
+          // Lưu ý: play() sẽ check queue. Nếu ta vừa set queue, findIndex sẽ trả về startIndex.
+          this.play(song);
+      }
   }
 
   togglePlay() {

@@ -59,6 +59,15 @@ router.on({
   },
 });
 
+// Custom event to force re-render on search (when router doesn't detect change due to same path)
+window.addEventListener("search-change", (e) => {
+    // Only if we are on search page
+    const isSearch = window.location.hash.includes("/search") || window.location.pathname.includes("/search");
+    if (isSearch) {
+        renderSearch(router, e.detail?.query);
+    }
+});
+
 // Bảo vệ Route / Hooks
 router.hooks({
   before: async (done, params) => {

@@ -124,3 +124,40 @@ body.sidebar-collapsed .logo-container {
     position: relative !important;
     z-index: 50 !important;
 }
+/* Search Dropdown Styles */
+.search-dropdown {
+    background-color: #212121;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-section {
+    @apply py-2;
+}
+
+.search-suggestion-item {
+    transition: background-color 0.2s;
+}
+
+/* Category Filter Pill */
+.category-pill {
+    @apply px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-white/10 whitespace-nowrap;
+}
+
+.category-pill.active {
+    @apply bg-white text-black border-white;
+}
+
+.category-pill:not(.active) {
+    @apply bg-white/5 text-yt-text-primary hover:bg-white/10;
+}
+
+/* Song Row Hover Effects */
+.song-row:hover .song-row-play {
+    opacity: 1;
+}
+
+.song-row-play {
+    opacity: 0;
+    transition: opacity 0.2s;
+}

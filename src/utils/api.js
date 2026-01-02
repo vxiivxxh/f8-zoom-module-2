@@ -109,8 +109,10 @@ export const apiClient = {
     );
   },
 
-  search(query, options = {}) {
-    return this.get(`/search?q=${encodeURIComponent(query)}`, options);
+  search(query, params = {}, options = {}) {
+    // params có thể chứa limit, page
+    const qs = new URLSearchParams({ q: query, ...params }).toString();
+    return this.get(`/search?${qs}`, options);
   },
 
   getPlaylistDetail(slug, options = {}) {

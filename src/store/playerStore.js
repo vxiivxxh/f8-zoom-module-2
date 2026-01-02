@@ -248,8 +248,7 @@ class PlayerStore {
       if (this.mode === "YOUTUBE" && this.player) this.player.playVideo();
       if (this.mode === "AUDIO" && this.audio) this.audio.play();
     }
-    // Optimistic update
-    this.setState({ isPlaying: !this.state.isPlaying });
+    // State will be updated by player event listeners (no optimistic update to avoid race condition)
   }
 
   next() {

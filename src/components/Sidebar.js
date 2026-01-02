@@ -90,4 +90,27 @@ export const Sidebar = () => {
   `;
 };
 
+export const setupSidebarEvents = (router) => {
+  const logo = document.querySelector(".logo-container");
+  if (logo) {
+    logo.addEventListener("click", (e) => {
+      e.preventDefault();
+      router.navigate("/");
+    });
+  }
+
+  // Toggle Button Logic (Existing placeholder or new)
+  const toggleBtn = document.getElementById("sidebar-toggle");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      const sidebar = document.querySelector("aside");
+      if (sidebar) {
+        // Simple toggle logic if needed, or rely on existing CSS based approaches
+        // Usually sidebar toggle might imply collapsing.
+        // For now, focusing on Logo as requested.
+      }
+    });
+  }
+};
+
 // End of Sidebar component

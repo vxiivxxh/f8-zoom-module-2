@@ -1,5 +1,5 @@
 
-import { Sidebar } from '../components/Sidebar';
+import { Sidebar, setupSidebarEvents } from "../components/Sidebar";
 import { Header, setupHeaderEvents } from '../components/Header';
 import { Player, setupPlayerEvents } from '../components/Player';
 import { playerStore } from '../store/playerStore';
@@ -32,6 +32,7 @@ export const MainLayout = (content, router, options = {}) => {
 
     // Gắn sự kiện
     setupHeaderEvents(router);
+    setupSidebarEvents(router);
     if (playerStore.state.currentSong) {
       setupPlayerEvents();
     }

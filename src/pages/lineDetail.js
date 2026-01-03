@@ -16,8 +16,8 @@ export const renderLineDetail = async (router, match) => {
   );
 
   try {
-    // Parallel fetch for Line Info and its content types
-    // Note: API spec separates them. We might want to show them in sections.
+    // Tìm nạp song song cho Thông tin Dòng nhạc và các loại nội dung của nó
+    // Lưu ý: Đặc tả API tách biệt chúng. Chúng ta có thể muốn hiển thị chúng trong các phần.
     const [lineRes, songsRes, playlistsRes, albumsRes, videosRes] =
       await Promise.all([
         apiClient.getLineDetail(slug),
@@ -38,13 +38,13 @@ export const renderLineDetail = async (router, match) => {
 
     const content = `
       <div class="space-y-12 pb-10">
-        <!-- Header -->
+        <!-- Tiêu đề -->
         <div class="flex flex-col gap-2 mb-6">
             <h1 class="text-4xl font-bold">${title}</h1>
             ${description ? `<p class="text-gray-400">${description}</p>` : ""}
         </div>
         
-        <!-- Sections -->
+        <!-- Các phần -->
         ${
           songs.length > 0
             ? Section("Bài hát nổi bật", songs, "line-songs", "song")

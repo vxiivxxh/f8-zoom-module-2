@@ -21,7 +21,7 @@ export const renderCategoryDetail = async (router, match) => {
     const category = data.data || data;
     const title = category.title || category.name || "Category Detail";
     
-    // Check for sections, items, or subcategories
+    // Kiểm tra các phần, mục hoặc danh mục con
     const sections = category.sections || [];
     const items = category.items || category.subcategories || [];
 

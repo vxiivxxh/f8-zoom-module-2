@@ -10,7 +10,7 @@ export const apiClient = {
       ...options.headers,
     };
 
-    // Thêm Authorization header nếu có token
+    // Thêm tiêu đề Authorization nếu có token
     const token = localStorage.getItem("accessToken");
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
@@ -110,7 +110,7 @@ export const apiClient = {
   },
 
   search(query, params = {}, options = {}) {
-    // params có thể chứa limit, page
+    // tham số có thể chứa limit, page
     const qs = new URLSearchParams({ q: query, ...params }).toString();
     return this.get(`/search?${qs}`, options);
   },

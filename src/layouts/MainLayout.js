@@ -14,10 +14,10 @@ export const MainLayout = (content, router, options = {}) => {
         <div class="h-screen w-full bg-yt-base text-yt-text-primary overflow-hidden relative grid grid-cols-[auto_1fr]">
             <div class="aurora-bg"></div>
             
-            <!-- Sidebar: Grid item, width determined by class (w-sidebar or override) -->
+            <!-- Sidebar: Mục lưới, chiều rộng được xác định bởi class (w-sidebar hoặc ghi đè) -->
             ${Sidebar()}
             
-            <!-- Main Content Wrapper: Vertical flow -->
+            <!-- Wrapper nội dung chính: Luồng dọc -->
             <div class="flex flex-col min-w-0 transition-all relative z-10 h-full overflow-hidden">
                 ${Header()}
                 
@@ -62,7 +62,7 @@ export const MainLayout = (content, router, options = {}) => {
       ".bg-yt-player.fixed.bottom-0"
     );
 
-    // Case 1: Player needs to be mounted (first time)
+    // Trường hợp 1: Player cần được gắn (lần đầu)
     if (state.currentSong && !existingPlayer) {
       const appDiv = document.querySelector("#app > div");
       if (appDiv) {
@@ -74,10 +74,10 @@ export const MainLayout = (content, router, options = {}) => {
       return;
     }
 
-    // Case 2: Player exists. Update UI efficiently
+    // Trường hợp 2: Player đã tồn tại. Cập nhật UI hiệu quả
     if (existingPlayer) {
-      // If song changed completely, full re-render might be safest to swap Image/Title
-      // Checking title text content is a cheat-way to see if song changed.
+      // Nếu bài hát thay đổi hoàn toàn, render lại toàn bộ có thể là an toàn nhất để đổi Hình ảnh/Tiêu đề
+      // Kiểm tra nội dung text tiêu đề là một cách "ăn gian" để xem bài hát có thay đổi không.
       const currentTitleEl = existingPlayer.querySelector("h3");
       const currentTitle = currentTitleEl ? currentTitleEl.textContent : "";
       const newTitle = state.currentSong
@@ -85,13 +85,13 @@ export const MainLayout = (content, router, options = {}) => {
         : "";
 
       if (state.currentSong && currentTitle !== newTitle && newTitle) {
-        // Song changed -> Re-render
+        // Bài hát thay đổi -> Render lại
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = Player();
         existingPlayer.replaceWith(tempDiv.firstElementChild);
         setupPlayerEvents();
       } else {
-        // Only state/progress update -> Granular Update
+        // Chỉ cập nhật trạng thái/tiến trình -> Cập nhật từng phần
         import("../components/Player").then(({ updatePlayerUI }) => {
           updatePlayerUI(state);
         });
@@ -100,7 +100,7 @@ export const MainLayout = (content, router, options = {}) => {
   });
 
   const authUnsub = authStore.subscribe((state) => {
-    // Re-render Header
+    // Render lại Header
     const headerContainer = document.querySelector("header");
     if (headerContainer) {
       const tempDiv = document.createElement("div");

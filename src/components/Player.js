@@ -81,7 +81,7 @@ export const Player = () => {
   `;
 };
 
-// Formatting Helper
+// Trình trợ giúp định dạng
 const formatTime = (seconds) => {
   if (!seconds || isNaN(seconds)) return "0:00";
   const min = Math.floor(seconds / 60);
@@ -89,7 +89,7 @@ const formatTime = (seconds) => {
   return `${min}:${sec < 10 ? "0" + sec : sec}`;
 };
 
-// Bind events & Subscribe
+// Gắn sự kiện & Đăng ký
 export const setupPlayerEvents = () => {
   const playBtn = document.getElementById("player-play");
   const nextBtn = document.getElementById("player-next");
@@ -99,13 +99,13 @@ export const setupPlayerEvents = () => {
   const progressBar = document.getElementById("player-progress-bar");
   const muteBtn = document.getElementById("player-mute");
 
-  // Use event delegation on the player wrapper for more reliable event handling
-  // This prevents handlers from being lost when button innerHTML is replaced
+  // Sử dụng ủy quyền sự kiện trên wrapper của trình phát để xử lý sự kiện đáng tin cậy hơn
+  // Điều này ngăn các trình xử lý bị mất khi innerHTML của nút bị thay thế
   const playerWrapper = document.querySelector(".fixed.bottom-0");
 
   if (playerWrapper) {
     playerWrapper.addEventListener("click", (e) => {
-      // Play/Pause button
+      // Nút Phát/Tạm dừng
       const playBtn = e.target.closest("#player-play");
       if (playBtn) {
         e.preventDefault();
@@ -114,7 +114,7 @@ export const setupPlayerEvents = () => {
         return;
       }
 
-      // Next button
+      // Nút Tiếp theo
       const nextBtn = e.target.closest("#player-next");
       if (nextBtn) {
         e.preventDefault();
@@ -123,7 +123,7 @@ export const setupPlayerEvents = () => {
         return;
       }
 
-      // Previous button
+      // Nút Trước đó
       const prevBtn = e.target.closest("#player-prev");
       if (prevBtn) {
         e.preventDefault();
@@ -132,7 +132,7 @@ export const setupPlayerEvents = () => {
         return;
       }
 
-      // Mute button
+      // Nút Tắt tiếng
       const muteButton = e.target.closest("#player-mute");
       if (muteButton) {
         e.preventDefault();
@@ -141,7 +141,7 @@ export const setupPlayerEvents = () => {
         return;
       }
 
-      // Video toggle button
+      // Nút bật/tắt Video
       const videoBtn = e.target.closest("#player-toggle-video");
       if (videoBtn) {
         e.preventDefault();
@@ -155,7 +155,7 @@ export const setupPlayerEvents = () => {
         return;
       }
 
-      // Progress bar
+      // Thanh tiến trình
       const progressClick = e.target.closest("#player-progress-bar");
       if (progressClick && !e.target.closest("input")) {
         const rect = progressClick.getBoundingClientRect();
@@ -176,9 +176,9 @@ export const setupPlayerEvents = () => {
   }
 };
 
-// Internal update function called by listener
+// Hàm cập nhật nội bộ được gọi bởi trình nghe (listener)
 export const updatePlayerUI = (state) => {
-  // 1. Update Progress & Time
+  // 1. Cập nhật Tiến trình & Thời gian
   const currentEl = document.querySelector(".time-current");
   const durationEl = document.querySelector(".time-duration");
   const progressFill = document.querySelector("#player-progress-bar > div");
@@ -192,7 +192,7 @@ export const updatePlayerUI = (state) => {
     progressFill.style.width = `${percent}%`;
   }
 
-  // 2. Play/Pause Icon - Toggle visibility without innerHTML
+  // 2. Biểu tượng Phát/Tạm dừng - Bật/tắt hiển thị mà không cần innerHTML
   const playBtn = document.getElementById("player-play");
   if (playBtn) {
     const pauseIcon = playBtn.querySelector(".pause-icon");
@@ -208,11 +208,11 @@ export const updatePlayerUI = (state) => {
       }
     }
 
-    // Update data attribute for state tracking
+    // Cập nhật thuộc tính data để theo dõi trạng thái
     playBtn.setAttribute("data-playing", state.isPlaying);
   }
 
-  // 3. Volume / Mute
+  // 3. Âm lượng / Tắt tiếng
   const muteBtn = document.getElementById("player-mute");
   if (muteBtn) {
     const icon =
@@ -224,8 +224,8 @@ export const updatePlayerUI = (state) => {
 
   const volInput = document.getElementById("player-volume");
   if (volInput) {
-    // Only update if not being dragged? Hard to detect.
-    // For now update to sync if mute toggled elsewhere
+    // Chỉ cập nhật nếu không bị kéo? Khó phát hiện.
+    // Hiện tại cập nhật để đồng bộ nếu tắt tiếng được bật ở nơi khác
     const targetVal = state.isMuted ? 0 : state.volume;
     if (volInput.value != targetVal) volInput.value = targetVal;
   }

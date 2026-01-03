@@ -14,7 +14,7 @@ class PlayerStore {
     };
     this.listeners = [];
     this.player = null; // Instance YouTube Player
-    this.audio = new Audio(); // HTML5 Audio Player
+    this.audio = new Audio(); // Trình phát Audio HTML5
     this.mode = "NONE"; // 'YOUTUBE' | 'AUDIO' | 'NONE'
 
     this.initPlayer();
@@ -22,7 +22,7 @@ class PlayerStore {
   }
 
   initAudio() {
-    // Bind Audio Events
+    // Gắn sự kiện Audio
     this.audio.addEventListener("ended", () => {
       this.next();
     });
@@ -49,7 +49,7 @@ class PlayerStore {
       this.setState({ isPlaying: false })
     );
 
-    // Initialize volume
+    // Khởi tạo âm lượng
     this.audio.volume = this.state.volume / 100;
   }
 
@@ -59,7 +59,7 @@ class PlayerStore {
     tag.src = "https://www.youtube.com/iframe_api";
     const firstScriptTag = document.getElementsByTagName("script")[0];
 
-    // Avoid duplicate script injection
+    // Tránh tiêm script trùng lặp
     if (
       !document.querySelector(
         'script[src="https://www.youtube.com/iframe_api"]'
@@ -85,7 +85,7 @@ class PlayerStore {
         events: {
           onReady: (event) => {
             this.setVolume(this.state.volume);
-            // Only double-check if we need to resume a YT video (edge case on reload)
+            // Chỉ kiểm tra kỹ nếu chúng ta cần khôi phục video YT (trường hợp biên khi tải lại)
           },
           onStateChange: (event) => {
             if (this.mode !== "YOUTUBE") return;
@@ -157,18 +157,18 @@ class PlayerStore {
       return;
     }
 
-    // Reset previous playback
+    // Đặt lại phát lại trước đó
     this.stopAll();
 
     // Bài hát mới
     this.setState({
       currentSong: song,
-      isPlaying: true, // Will be confirmed by events
+      isPlaying: true, // Sẽ được xác nhận bởi các sự kiện
       currentTime: 0,
       duration: song.duration || 0,
     });
 
-    // Choose Player
+    // Chọn Trình phát
     if (song.audioUrl) {
       this.mode = "AUDIO";
       this.audio.src = song.audioUrl;
@@ -178,8 +178,8 @@ class PlayerStore {
       if (this.player && typeof this.player.loadVideoById === "function") {
         this.player.loadVideoById(song.id);
       } else {
-        // Queue it up or retry?
-        // API might not be ready. Simple retry:
+        // Xếp hàng đợi hoặc thử lại?
+        // API có thể chưa sẵn sàng. Thử lại đơn giản:
         setTimeout(() => {
           if (this.state.currentSong.id === song.id && this.player) {
             this.player.loadVideoById(song.id);
@@ -204,13 +204,13 @@ class PlayerStore {
   }
 
   stopAll() {
-    // Pause YouTube
+    // Tạm dừng YouTube
     if (this.player && typeof this.player.pauseVideo === "function") {
       this.player.pauseVideo();
     }
     this.stopProgressLoop();
 
-    // Pause Audio
+    // Tạm dừng Audio
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0;
@@ -222,13 +222,6 @@ class PlayerStore {
     this.state.currentIndex = startIndex;
     const song = songs[startIndex];
     if (song) {
-      // Force play new song, even if same ID (context changed)
-      // But play() checks ID. We need to bypass or prep.
-      // Actually, play() check handles resume. If we want to restart, we should stop first?
-      // Let's rely on play() logic. If same song, it resumes.
-      // If user wants to restart, they can seek.
-      // But setQueue usually implies starting fresh context.
-      // Let's effectively "stop" current if it matches to force reload?
       if (this.state.currentSong && this.state.currentSong.id === song.id) {
         this.seek(0);
         if (!this.state.isPlaying) this.togglePlay();
@@ -240,15 +233,15 @@ class PlayerStore {
 
   togglePlay() {
     if (this.state.isPlaying) {
-      // PAUSE
+      // TẠM DỪNG
       if (this.mode === "YOUTUBE" && this.player) this.player.pauseVideo();
       if (this.mode === "AUDIO" && this.audio) this.audio.pause();
     } else {
-      // PLAY
+      // PHÁT
       if (this.mode === "YOUTUBE" && this.player) this.player.playVideo();
       if (this.mode === "AUDIO" && this.audio) this.audio.play();
     }
-    // State will be updated by player event listeners (no optimistic update to avoid race condition)
+    // State sẽ được cập nhật bởi các sự kiện lắng nghe của trình phát (không cập nhật lạc quan để tránh điều kiện race)
   }
 
   next() {

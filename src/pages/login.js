@@ -69,7 +69,7 @@ export const renderLogin = (router) => {
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
     
-    // Validation
+    // Xác thực
     if (!validateEmail(email)) {
         errorDiv.textContent = 'Email không hợp lệ. Vui lòng kiểm tra lại.';
         errorDiv.classList.remove('hidden');

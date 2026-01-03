@@ -1,6 +1,6 @@
 
 /**
- * Map of genre keywords to accent colors
+ * Bản đồ từ khóa thể loại sang màu nhấn
  */
 const GENRE_COLORS = {
   'Rock': '#FF0000', // Red
@@ -16,7 +16,7 @@ const GENRE_COLORS = {
 };
 
 /**
- * Fallback colors for unmatched genres
+ * Màu dự phòng cho các thể loại không khớp
  */
 const FALLBACK_COLORS = [
     '#C62828', // Red
@@ -36,14 +36,14 @@ const FALLBACK_COLORS = [
 ];
 
 const getAccentColor = (title) => {
-    // Check for keyword matches
+    // Kiểm tra từ khóa trùng khớp
     for (const [key, color] of Object.entries(GENRE_COLORS)) {
         if (title.toLowerCase().includes(key.toLowerCase())) {
             return color;
         }
     }
     
-    // Fallback: Deterministic hash
+    // Dự phòng: Hash xác định
     let hash = 0;
     for (let i = 0; i < title.length; i++) {
         hash = title.charCodeAt(i) + ((hash << 5) - hash);
@@ -55,9 +55,9 @@ export const MoodCard = (item, type = "category") => {
   const title = item.title || item.name || "Mood";
   const accentColor = item.color || getAccentColor(title);
 
-  // Fixed height (~56-64px -> h-16 is 64px, h-14 is 56px)
-  // Dark gray bg: bg-[#212121] or bg-gray-800
-  // Accent bar: w-1.5
+  // Chiều cao cố định (~56-64px -> h-16 là 64px, h-14 là 56px)
+  // Nền xám đậm: bg-[#212121] hoặc bg-gray-800
+  // Thanh điểm nhấn: w-1.5
 
   return `
     <div class="group relative flex items-center h-12 w-[180px] bg-[#292929] hover:bg-[#3e3e3e] active:bg-[#222222] rounded-xl overflow-hidden transition-colors outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-white mood-card"
@@ -65,10 +65,10 @@ export const MoodCard = (item, type = "category") => {
        data-slug="${item.slug || ""}"
        data-navigo>
         
-        <!-- Accent Bar on Left -->
+        <!-- Thanh điểm nhấn bên trái -->
         <div class="h-full w-1.5 shrink-0" style="background-color: ${accentColor}"></div>
         
-        <!-- Label -->
+        <!-- Nhãn -->
         <div class="flex-1 px-4 flex items-center h-full">
             <span class="text-white font-medium text-[15px] truncate select-none">
                 ${title}
@@ -81,7 +81,7 @@ export const MoodCard = (item, type = "category") => {
 export const MoodGrid = (items, type = "category") => {
   if (!items || items.length === 0) return "";
 
-  // Grid with fixed 180px columns
+  // Lưới với các cột cố định 180px
   return `
      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, 180px);">
         ${items.map((item) => MoodCard(item, type)).join("")}

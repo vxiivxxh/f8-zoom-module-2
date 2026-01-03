@@ -21,7 +21,7 @@ export const renderMoodDetail = async (router, match) => {
     const mood = data.data || data;
     const title = mood.title || mood.name || "Mood Detail";
     
-    // Check for sections or flat items
+    // Kiểm tra các phần hoặc các mục phẳng
     const sections = mood.sections || [];
     const items = mood.items || mood.data || [];
 

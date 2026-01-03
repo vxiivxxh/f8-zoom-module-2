@@ -7,7 +7,7 @@ import { TopResultCard } from "../components/TopResultCard";
 import { Section } from "../components/Section";
 import { SongRow } from "../components/SongRow";
 
-// State for search page
+// Trạng thái cho trang tìm kiếm
 let currentFilter = "all"; // all, song, video, album, artist, playlist
 let searchResults = [];
 
@@ -16,8 +16,8 @@ export const renderSearch = async (router, queryOverride) => {
   const params = new URLSearchParams(window.location.search);
   const query = queryOverride || params.get("q");
 
-  // Reset filter when new search
-  // Note: In a real app we might want to sync filter with URL param too
+  // Đặt lại bộ lọc khi tìm kiếm mới
+  // Lưu ý: Trong ứng dụng thực tế, chúng ta có thể muốn đồng bộ bộ lọc với tham số URL
   currentFilter = "all";
 
   if (!query) {
@@ -47,13 +47,13 @@ export const renderSearch = async (router, queryOverride) => {
 
   try {
     const res = await apiClient.search(query, { limit: 50 });
-    // Handle both new { results: [] } and old { songs: [], ... } formats just in case
+    // Xử lý cả định dạng mới { results: [] } và cũ { songs: [], ... } để đề phòng
     const data = res || {};
 
     if (data.results) {
       searchResults = data.results;
     } else {
-      // Fallback for old API structure if it still exists or changes
+      // Dự phòng cho cấu trúc API cũ nếu nó vẫn tồn tại hoặc thay đổi
       searchResults = [
         ...(data.songs || []).map((i) => ({ ...i, type: "song" })),
         ...(data.albums || []).map((i) => ({ ...i, type: "album" })),
@@ -81,7 +81,7 @@ export const renderSearch = async (router, queryOverride) => {
 };
 
 const renderSearchResults = (router, query) => {
-  // 1. Group Data
+  // 1. Nhóm Dữ liệu
   const songs = searchResults.filter((item) => item.type === "song");
   const videos = searchResults.filter((item) => item.type === "video");
   const albums = searchResults.filter((item) => item.type === "album");
@@ -90,9 +90,9 @@ const renderSearchResults = (router, query) => {
 
   const topResult = searchResults.length > 0 ? searchResults[0] : null;
 
-  // 2. Filter logic for View
-  // If currentFilter is 'all', show sections.
-  // If 'song', show only song list, etc.
+  // 2. Logic lọc cho View
+  // Nếu currentFilter là 'all', hiển thị các phần.
+  // Nếu 'song', chỉ hiển thị danh sách bài hát, v.v.
   let content = "";
   const hasResults = searchResults.length > 0;
 
@@ -106,7 +106,7 @@ const renderSearchResults = (router, query) => {
             </div>
         `;
   } else {
-    // Filter Bar
+    // Thanh bộ lọc
     const filters = [
       { id: "all", label: "Tất cả" },
       { id: "song", label: "Bài hát" },
@@ -135,7 +135,7 @@ const renderSearchResults = (router, query) => {
     let resultsHTML = "";
 
     if (currentFilter === "all") {
-      // Top Result
+      // Kết quả hàng đầu
       if (topResult) {
         resultsHTML += `
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
@@ -156,7 +156,7 @@ const renderSearchResults = (router, query) => {
                 `;
       }
 
-      // Other Sections
+      // Các phần khác
       if (artists.length > 0)
         resultsHTML += Section("Nghệ sĩ", artists, "search-artists", "artist");
       if (albums.length > 0)
@@ -171,7 +171,7 @@ const renderSearchResults = (router, query) => {
           "playlist"
         );
     } else {
-      // Filtered View
+      // Chế độ xem đã lọc
       const filteredItems = searchResults.filter(
         (item) => item.type === currentFilter
       );
@@ -215,7 +215,7 @@ const renderSearchResults = (router, query) => {
 
   MainLayout(content, router);
 
-  // Re-attach events for filter buttons since we re-rendered
+  // Gắn lại sự kiện cho các nút bộ lọc vì chúng ta đã render lại
   setupSearchEvents(router, query);
 };
 
@@ -223,7 +223,7 @@ export const setupSearchEvents = (router, query) => {
   const main = document.querySelector("main");
   if (!main) return;
 
-  // Filter Pills Click
+  // Click vào Pill Bộ lọc
   const pills = main.querySelectorAll(".category-pill");
   pills.forEach((pill) => {
     pill.addEventListener("click", () => {
@@ -235,7 +235,7 @@ export const setupSearchEvents = (router, query) => {
     });
   });
 
-  // Scroll Buttons
+  // Các nút cuộn
   const scrollBtns = main.querySelectorAll("[data-scroll]");
   scrollBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -257,13 +257,11 @@ export const setupSearchEvents = (router, query) => {
   const resultsContainer = document.getElementById("search-results-container");
   if (resultsContainer) {
     resultsContainer.addEventListener("click", (e) => {
-      // Handle Song Rows
+      // Xử lý Bài hát
       const songRow = e.target.closest(".song-row");
       if (songRow) {
-        // Check if play button or row click
-        // If clicked on album link or something else, handle it?
-
-        // For now, whole row plays song
+        // Kiểm tra xem nút phát hay hàng được click
+        // Hiện tại, cả hàng sẽ phát bài hát
         try {
           const songData = JSON.parse(songRow.dataset.song);
           import("../store/playerStore").then(({ playerStore }) => {
@@ -275,17 +273,17 @@ export const setupSearchEvents = (router, query) => {
         return;
       }
 
-      // Handle Cards
+      // Xử lý Thẻ (Cards)
       const card = e.target.closest(".card-item");
       if (card) {
         const type = card.dataset.type;
         const id = card.dataset.id;
         const itemData = JSON.parse(card.dataset.item || "{}");
 
-        // Play Button Click
+        // Click nút Phát
         const playBtn = e.target.closest(".play-btn");
         if (playBtn) {
-          e.stopPropagation(); // prevent navigation
+          e.stopPropagation(); // ngăn chặn điều hướng
           if (type === "video") {
             router.navigate(`video/${id}`);
           } else if (type === "song" || type === "album") {
@@ -296,13 +294,13 @@ export const setupSearchEvents = (router, query) => {
           return;
         }
 
-        // Navigation
+        // Điều hướng
         if (type === "album") router.navigate(`album/${id}`);
         else if (type === "playlist") router.navigate(`playlist/${id}`);
         else if (type === "artist") router.navigate(`artist/${id}`);
         else if (type === "video") router.navigate(`video/${id}`);
         else if (type === "song") {
-          // Click on card body for nice song plays it
+          // Click vào thân thẻ để phát bài hát (cho đẹp)
           import("../store/playerStore").then(({ playerStore }) => {
             playerStore.play(itemData);
           });

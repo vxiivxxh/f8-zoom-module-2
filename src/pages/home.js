@@ -117,11 +117,11 @@ export const renderHome = async (router) => {
 
     MainLayout(content, router);
 
-    // Event Delegation cho Cards
+    // Ủy quyền sự kiện cho Thẻ (Cards)
     const main = document.querySelector("main");
     if (main) {
       main.addEventListener("click", (e) => {
-        // Priority: Play Button -> Play Song
+        // Ưu tiên: Nút Phát -> Phát Bài hát
         const playBtn = e.target.closest(".play-btn");
         const card = e.target.closest(".card-item");
 
@@ -130,8 +130,8 @@ export const renderHome = async (router) => {
           const id = card.dataset.id;
           const itemData = JSON.parse(card.dataset.item || "{}");
 
-          // Only Play if explicitly a Song or Video (with play button)
-          // For Albums/Playlists/Artists, we ALWAYS navigate, even if play button is clicked
+          // Chỉ phát nếu rõ ràng là Bài hát hoặc Video (có nút phát)
+          // Đối với Albums/Playlists/Artists, chúng ta LUÔN điều hướng, ngay cả khi nút phát được click
           if (type === "song") {
             import("../store/playerStore").then(({ playerStore }) => {
               playerStore.play(itemData);
@@ -139,7 +139,7 @@ export const renderHome = async (router) => {
           } else if (type === "video") {
             router.navigate(`video/${id}`);
           } else {
-            // Navigate action for Containers (Album, Playlist, Artist)
+            // Hành động điều hướng cho Container (Album, Playlist, Artist)
             if (type === "album") router.navigate(`album/${id}`);
             else if (type === "playlist") router.navigate(`playlist/${id}`);
             else if (type === "artist") router.navigate(`artist/${id}`);
@@ -184,7 +184,6 @@ export const renderHome = async (router) => {
   }
 };
 
-//
 const renderSection = (title, items, id, subtitle = "") => {
   const displayItems = items.slice(0, 12);
 

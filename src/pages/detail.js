@@ -6,12 +6,12 @@ import { Icons } from '../components/Icons';
 
 /**
  * Shared Detail Page Renderer
- * @param {Object} router - Navigo router instance
+ * @param {Object} router - Instance router Navigo
  * @param {string} type - 'album' | 'playlist'
- * @param {string} id - Item ID or Slug
+ * @param {string} id - ID mục hoặc Slug
  */
 const renderDetail = async (router, type, id) => {
-    // 1. Loading State with custom padding
+    // 1. Trạng thái Đang tải với padding tùy chỉnh
     MainLayout(`
         <div class="flex items-center justify-center h-full">
             <div class="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -28,17 +28,17 @@ const renderDetail = async (router, type, id) => {
 
       console.log(`[Detail Page] Raw response for ${type} ${id}:`, res);
 
-      const data = res.data || res; // Fallback if data is at root
-      // data.id check ensures we actually have an item, not just a status object
+      const data = res.data || res; // Dự phòng nếu dữ liệu ở root
+      // Kiểm tra data.id đảm bảo chúng ta thực sự có một mục, không chỉ là một object trạng thái
       if (!data || (!data.id && !data.title)) {
         console.error("Invalid data received:", data);
         throw new Error("Not found or invalid data");
       }
 
-      // Debug Log
+      // Log gỡ lỗi
       console.log(`[Detail Page] Extracted data:`, data);
 
-      // 3. Extract Data for UI
+      // 3. Trích xuất dữ liệu cho UI
       const isAlbum = type === "album";
       const title = escapeHTML(data.title || data.name || "Untitled");
       const description = escapeHTML(
@@ -50,7 +50,7 @@ const renderDetail = async (router, type, id) => {
         data.image ||
         "https://via.placeholder.com/300";
 
-      // Metadata construction
+      // Xây dựng Metadata
       let artistNames = "Unknown Artist";
       if (Array.isArray(data.artists) && data.artists.length > 0) {
         artistNames = data.artists.map((a) => a.name).join(", ");
@@ -62,32 +62,32 @@ const renderDetail = async (router, type, id) => {
         data.tracks[0].artists &&
         data.tracks[0].artists.length > 0
       ) {
-        // Infer from first track if album artist is missing
+        // Suy ra từ bài hát đầu tiên nếu nghệ sĩ album bị thiếu
         artistNames = data.tracks[0].artists.map((a) => a.name).join(", ");
       }
 
-      // Extract year from releaseDate (handles ISO format, slash format, or year-only)
-      let year = "2024"; // Default fallback
+      // Trích xuất năm từ releaseDate (xử lý định dạng ISO, dấu gạch chéo hoặc chỉ năm)
+      let year = "2024"; // Dự phòng mặc định
       if (data.releaseDate) {
-        // If it's an ISO date (2020-11-23T17:00:00.000Z) or YYYY-MM-DD, extract first 4 chars
+        // Nếu là ngày ISO (2020-11-23T17:00:00.000Z) hoặc YYYY-MM-DD, lấy 4 ký tự đầu tiên
         if (data.releaseDate.includes("-") || data.releaseDate.includes("T")) {
           year = data.releaseDate.substring(0, 4);
         } else if (data.releaseDate.includes("/")) {
-          // If it's DD/MM/YYYY or MM/DD/YYYY format
+          // Nếu là định dạng DD/MM/YYYY hoặc MM/DD/YYYY
           year = data.releaseDate.split("/").pop();
         } else {
-          // If it's already just a year
+          // Nếu đã chỉ là một năm
           year = data.releaseDate;
         }
       }
 
-      // Songs List
+      // Danh sách bài hát
       const songs = data.tracks || data.songs || data.song?.items || [];
 
       const songCount =
         data.songCount || (data.song ? data.song.total : songs.length);
 
-      // Duration formatting (seconds -> human readable)
+      // Định dạng thời lượng (giây -> dễ đọc)
       const totalDuration =
         data.duration || (data.song ? data.song.totalDuration : 0);
       const hours = Math.floor(totalDuration / 3600);
@@ -104,19 +104,19 @@ const renderDetail = async (router, type, id) => {
         .filter(Boolean)
         .join(" • ");
 
-      // 4. Render Content
+      // 4. Render Nội dung
       const content = `
             <div class="flex flex-col lg:flex-row gap-8 relative items-start">
                 
-                <!-- Left Column: Sticky Info -->
+                <!-- Cột trái: Thông tin dính (Sticky) -->
                 <div class="w-full lg:w-[360px] flex-shrink-0 lg:sticky lg:top-0 flex flex-col items-center lg:items-center text-center">
                     
-                    <!-- Cover Image -->
+                    <!-- Ảnh bìa -->
                     <div class="w-[260px] lg:w-[320px] aspect-square rounded shadow-2xl overflow-hidden mb-6 mx-auto">
                         <img src="${image}" alt="${title}" class="w-full h-full object-cover left-column-cover-img">
                     </div>
 
-                    <!-- Info -->
+                    <!-- Thông tin -->
                     <div class="space-y-4 max-w-full">
                         <h1 class="text-3xl lg:text-4xl font-black text-white leading-tight">${title}</h1>
                         
@@ -133,19 +133,19 @@ const renderDetail = async (router, type, id) => {
                             : ""
                         }
 
-                        <!-- Action Bar -->
+                        <!-- Thanh hành động -->
                         <div class="flex items-center justify-center gap-4 mt-6">
-                             <!-- Download Button -->
+                             <!-- Nút Tải xuống -->
                              <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="Tải xuống">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
                              </button>
 
-                             <!-- Play Button -->
+                             <!-- Nút Phát -->
                              <button class="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg play-all-btn">
                                 ${Icons.Play}
                              </button>
 
-                             <!-- Menu Button -->
+                             <!-- Nút Menu -->
                              <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="Thêm">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                              </button>
@@ -153,7 +153,7 @@ const renderDetail = async (router, type, id) => {
                     </div>
                 </div>
 
-                <!-- Right Column: Track List -->
+                <!-- Cột phải: Danh sách bài hát -->
                 <div class="flex-1 min-w-0 w-full">
                     <div class="flex flex-col">
                         ${songs
@@ -167,7 +167,7 @@ const renderDetail = async (router, type, id) => {
 
       MainLayout(content, router, { padding: "px-8 py-8" });
 
-      // 5. Setup Events
+      // 5. Thiết lập Sự kiện
       setupDetailEvents({ songs, context: data });
     } catch (error) {
         console.error("Detail load error", error);
@@ -191,7 +191,7 @@ const renderSongRow = (song, index) => {
         <div class="group flex items-center gap-4 p-2 rounded-md hover:bg-white/10 cursor-pointer transition-colors border-b border-transparent hover:border-white/5 song-row" 
              data-index="${index}">
              
-            <!-- Index / Play Icon -->
+            <!-- Chỉ mục / Biểu tượng Phát -->
             <div class="w-8 text-center text-sm text-yt-text-secondary group-hover:hidden font-medium">
                 ${index + 1}
             </div>
@@ -199,25 +199,25 @@ const renderSongRow = (song, index) => {
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
 
-            <!-- Image -->
+            <!-- Hình ảnh -->
             <div class="w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-800">
                 <img src="${
                   image || "https://via.placeholder.com/48"
                 }" alt="${title}" class="w-full h-full object-cover">
             </div>
 
-            <!-- Info -->
+            <!-- Thông tin -->
             <div class="flex-1 min-w-0 flex flex-col justify-center">
                 <h4 class="text-white font-medium truncate text-[15px]">${title}</h4>
                 <p class="text-yt-text-secondary text-sm truncate hover:underline hover:text-white cursor-pointer">${artist}</p>
             </div>
 
-            <!-- Album Name (Hidden on small screens) -->
+            <!-- Tên Album (Ẩn trên màn hình nhỏ) -->
              <div class="hidden md:block w-1/4 px-2 text-sm text-yt-text-secondary truncate">
                 ${escapeHTML(song.album?.title || "")}
             </div>
 
-            <!-- Duration -->
+            <!-- Thời lượng -->
             <div class="text-sm text-yt-text-secondary w-12 text-right font-variant-numeric">
                 ${duration}
             </div>
@@ -230,7 +230,7 @@ const setupDetailEvents = ({ songs, context }) => {
     if (!main) return;
 
     main.addEventListener("click", (e) => {
-      // Play Row
+      // Phát Hàng
       const row = e.target.closest(".song-row");
       if (row) {
         const index = parseInt(row.dataset.index, 10);
@@ -240,7 +240,7 @@ const setupDetailEvents = ({ songs, context }) => {
         return;
       }
 
-      // Play All Button
+      // Nút Phát tất cả
       const playAllBtn = e.target.closest(".play-all-btn");
       if (playAllBtn && songs.length > 0) {
         import("../store/playerStore").then(({ playerStore }) => {
@@ -249,17 +249,17 @@ const setupDetailEvents = ({ songs, context }) => {
       }
     });
 
-    // Subscribe to Player updates to sync cover
+    // Đăng ký cập nhật Player để đồng bộ bìa
     import("../store/playerStore").then(({ playerStore }) => {
       const coverImg = document.querySelector(".left-column-cover-img");
 
       playerStore.subscribe((state) => {
-        // Check if we are still on the detail page (element exists)
+        // Kiểm tra xem chúng ta có còn ở trang chi tiết không (phần tử tồn tại)
         if (!document.body.contains(coverImg)) return;
 
         const currentSong = state.currentSong;
         if (currentSong && coverImg) {
-          // Determine image to show
+          // Xác định hình ảnh để hiển thị
           const newImage =
             (currentSong.thumbnails && currentSong.thumbnails[0]) ||
             currentSong.thumbnail ||

@@ -13,7 +13,7 @@ export const SongRow = (song) => {
     song.thumbnail ||
     "https://via.placeholder.com/60";
 
-  // Format duration
+  // Định dạng thời lượng
   const formatTime = (seconds) => {
     if (!seconds) return "";
     const min = Math.floor(seconds / 60);

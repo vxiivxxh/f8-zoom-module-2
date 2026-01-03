@@ -5,7 +5,7 @@ import { Icons } from "../components/Icons";
 import { Card } from "../components/Card";
 
 let state = {
-  country: { code: "VN", name: "Vietnam" }, // Default
+  country: { code: "VN", name: "Vietnam" }, // Mặc định
   subscribers: {},
   artistPage: 0,
   artists: [],
@@ -13,10 +13,10 @@ let state = {
   videos: [],
 };
 
-const ARTISTS_PER_PAGE = 8; // 4 per column * 2 columns
+const ARTISTS_PER_PAGE = 8; // 4 mỗi cột * 2 cột
 
 export const renderCharts = async (router) => {
-  // Skeleton / Loading State
+  // Skeleton / Trạng thái đang tải
   MainLayout(
     `
       <div class="flex items-center justify-center h-64">
@@ -27,14 +27,14 @@ export const renderCharts = async (router) => {
   );
 
   try {
-    // Initial Fetch: Countries
+    // Tìm nạp ban đầu: Quốc gia
     if (state.countries.length === 0) {
       const countryRes = await apiClient.getChartCountries();
       state.countries =
         countryRes.countries || countryRes.items || countryRes.data || [];
 
-      // Optional: Attempt to detect user location or default to VN/US if list allows
-      // For now stick to state.country default (VN) or update if needed
+      // Tùy chọn: Cố gắng phát hiện vị trí người dùng hoặc mặc định là VN/US nếu danh sách cho phép
+      // Hiện tại giữ mặc định state.country (VN) hoặc cập nhật nếu cần
       if (
         state.countries.length > 0 &&
         !state.countries.find((c) => c.code === state.country.code)
@@ -78,7 +78,7 @@ const loadChartData = async () => {
 const renderContent = (router) => {
   const mainContent = `
        <div class="space-y-12 pb-20">
-         <!-- Header & Country Selector -->
+         <!-- Tiêu đề & Bộ chọn Quốc gia -->
          <div class="flex flex-col items-start gap-4">
             <div>
                  <h2 class="text-3xl font-bold mb-2">Bảng xếp hạng</h2>
@@ -86,11 +86,11 @@ const renderContent = (router) => {
                    state.country.name
                  )}</p>
             </div>
-            <!-- Country Selector moved here -->
+            <!-- Bộ chọn Quốc gia đã được chuyển đến đây -->
             ${renderCountrySelector()}
          </div>
          
-         <!-- Top Songs / Video Chart (Horizontal Carousel) -->
+         <!-- Bài hát hàng đầu / Bảng xếp hạng Video (Carousel Ngang) -->
          <section>
              <div class="flex items-center justify-between mb-6">
                  <h3 class="text-2xl font-bold">BXH Video</h3>
@@ -113,7 +113,7 @@ const renderContent = (router) => {
              </div>
          </section>
 
-         <!-- Top Artists Chart (Dual Column Vertical List) -->
+         <!-- Bảng xếp hạng Nghệ sĩ hàng đầu (Danh sách dọc 2 cột) -->
          <section>
              <div class="flex items-center justify-between mb-6">
                  <h3 class="text-2xl font-bold">Nghệ sĩ hàng đầu</h3>
@@ -169,17 +169,17 @@ const renderCountrySelector = () => {
 };
 
 const renderArtistList = () => {
-  // Pagination logic
+  // Logic phân trang
   const start = state.artistPage * ARTISTS_PER_PAGE;
   const end = start + ARTISTS_PER_PAGE;
   const currentItems = state.artists.slice(start, end);
 
-  // Split into 2 columns
+  // Chia thành 2 cột
   const mid = Math.ceil(currentItems.length / 2);
   const leftCol = currentItems.slice(0, mid);
   const rightCol = currentItems.slice(mid);
 
-  // Helper to render a column
+  // Helper để render một cột
   const renderCol = (items, offset) => `
         <div class="flex flex-col gap-2">
             ${items
@@ -197,13 +197,13 @@ const renderArtistList = () => {
 };
 
 const renderArtistRowItem = (artist, indexRank) => {
-  // API returns 'rank' explicitly, otherwise fallback to index + 1
+  // API trả về 'rank' một cách rõ ràng, nếu không thì dùng index + 1 làm dự phòng
   const rank = artist.rank || indexRank;
   const rawName = artist.name || "Unknown";
   const name = escapeHTML(rawName);
 
-  // API returns 'totalViews', using that as secondary text
-  // User requested "Subscribers" but data is 'totalViews' for this chart type usually
+  // API trả về 'totalViews', sử dụng nó làm văn bản phụ
+  // Người dùng yêu cầu "Subscribers" nhưng dữ liệu thường là 'totalViews' cho loại biểu đồ này
   let secondaryText = "N/A";
   if (artist.totalViews) {
     secondaryText =
@@ -212,13 +212,13 @@ const renderArtistRowItem = (artist, indexRank) => {
         maximumFractionDigits: 1,
       }).format(artist.totalViews) + " views";
   } else if (artist.subscribers) {
-    secondaryText = artist.subscribers; // Fallback if property changes
+    secondaryText = artist.subscribers; // Dự phòng nếu thuộc tính thay đổi
   }
 
-  // Trend Logic
-  // API returns 'trend': 'up' | 'down' | 'same' (implied or other)
-  // Or we can use 'delta' to determine
-  let trendIcon = '<span class="text-gray-500 text-xs">●</span>'; // Default
+  // Logic Xu hướng
+  // API trả về 'trend': 'up' | 'down' | 'same' (ngụ ý hoặc khác)
+  // Hoặc chúng ta có thể sử dụng 'delta' để xác định
+  let trendIcon = '<span class="text-gray-500 text-xs">●</span>'; // Mặc định
 
   if (artist.trend === "up") {
     trendIcon = '<span class="text-green-500 text-xs text-[10px]">▲</span>';
@@ -234,19 +234,19 @@ const renderArtistRowItem = (artist, indexRank) => {
     <div class="flex items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer group transition-colors select-none artist-row" data-artist='${JSON.stringify(
       artist
     ).replace(/'/g, "&#39;")}' >
-        <!-- Rank -->
+        <!-- Xếp hạng -->
         <div class="w-12 flex flex-col items-center justify-center flex-shrink-0 mr-2">
             <span class="text-lg font-bold text-gray-300 font-mono">${rank}</span>
             <div class="mt-1 flex items-center justify-center h-4">${trendIcon}</div>
         </div>
 
-        <!-- Info -->
+        <!-- Thông tin -->
         <div class="flex-1 min-w-0">
             <h4 class="text-white font-medium text-base truncate" title="${name}">${name}</h4>
             <p class="text-gray-400 text-sm truncate">${secondaryText}</p>
         </div>
         
-        <!-- Arrow Interact (Visible on hover) -->
+        <!-- Mũi tên tương tác (Hiện khi hover) -->
         <div class="opacity-0 group-hover:opacity-100 transition-opacity px-2">
              <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </div>
@@ -258,17 +258,17 @@ const attachEventListeners = (router) => {
   const main = document.querySelector("main");
   if (!main) return;
 
-  // Country Select
+  // Chọn Quốc gia
   const select = document.getElementById("country-select");
   if (select) {
     select.addEventListener("change", async (e) => {
       const code = e.target.value;
       const name = e.target.options[e.target.selectedIndex].text;
       state.country = { code, name };
-      // Reset to first page when changing country
+      // Đặt lại về trang đầu tiên khi đổi quốc gia
       state.artistPage = 0;
 
-      // Re-render only content area or reload data
+      // Chỉ render lại vùng nội dung hoặc tải lại dữ liệu
       MainLayout(
         `
                 <div class="flex items-center justify-center h-64">
@@ -283,7 +283,7 @@ const attachEventListeners = (router) => {
     });
   }
 
-  // Video Carousel Scroll
+  // Cuộn Carousel Video
   const vidContainer = document.getElementById("video-charts-carousel");
   const btnVidPrev = document.getElementById("vid-prev");
   const btnVidNext = document.getElementById("vid-next");
@@ -303,7 +303,7 @@ const attachEventListeners = (router) => {
     });
   }
 
-  // Artist Pagination
+  // Phân trang Nghệ sĩ
   const btnArtPrev = document.getElementById("artist-prev");
   const btnArtNext = document.getElementById("artist-next");
 
@@ -322,9 +322,9 @@ const attachEventListeners = (router) => {
     });
   }
 
-  // Event Delegation
+  // Ủy quyền sự kiện
   main.addEventListener("click", (e) => {
-    // Navigate Video
+    // Điều hướng Video
     const videoCard = e.target.closest(".card-item[data-type='video']");
     if (videoCard) {
       e.preventDefault();
@@ -333,7 +333,7 @@ const attachEventListeners = (router) => {
       return;
     }
 
-    // Play Song (if any other card type logic exists here, mostly just artists and videos on this page)
+    // Phát bài hát (nếu có logic loại thẻ nào khác ở đây, chủ yếu chỉ là nghệ sĩ và video trên trang này)
     const songCard = e.target.closest(".song-card");
     if (songCard) {
       const songData = JSON.parse(songCard.dataset.song);
@@ -343,11 +343,11 @@ const attachEventListeners = (router) => {
       return;
     }
 
-    // Navigate Artist
+    // Điều hướng Nghệ sĩ
     const artistRow = e.target.closest(".artist-row");
     if (artistRow) {
       console.log("Navigate to artist: ", JSON.parse(artistRow.dataset.artist));
-      // router.navigate or similar if available
+      // router.navigate hoặc tương tự nếu có sẵn
     }
   });
 };

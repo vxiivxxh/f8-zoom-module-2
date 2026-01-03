@@ -7,7 +7,7 @@ export const renderVideo = async (router, match) => {
     const id = match?.data?.id;
     if (!id) return;
 
-    // 1. Loading State
+    // 1. Trạng thái Đang tải
     MainLayout(`
         <div class="flex items-center justify-center h-full">
             <div class="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -17,7 +17,7 @@ export const renderVideo = async (router, match) => {
     try {
         const data = await apiClient.getVideoDetail(id);
         
-        // Data Fallback
+        // Dữ liệu dự phòng
         const video = data.data || data;
         if (!video || !video.videoId) {
             throw new Error('Invalid video data');
@@ -30,10 +30,10 @@ export const renderVideo = async (router, match) => {
             ? video.artists.map(a => a.name).join(', ') 
             : (video.artist || 'Unknown Artist');
 
-        // 2. Render Content
+        // 2. Render Nội dung
         const content = `
             <div class="flex flex-col lg:flex-row gap-6 p-6 h-full overflow-hidden">
-                <!-- Left: Player & Info -->
+                <!-- Trái: Trình phát & Thông tin -->
                 <div class="flex-1 flex flex-col min-w-0 overflow-y-auto scrollbar-none pb-20">
                     <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl mb-4">
                         <iframe 
@@ -61,7 +61,7 @@ export const renderVideo = async (router, match) => {
                     </div>
                 </div>
 
-                <!-- Right: Related Videos -->
+                <!-- Phải: Video liên quan -->
                 <div class="w-full lg:w-[400px] flex-shrink-0 flex flex-col h-full overflow-hidden border-t lg:border-t-0 lg:border-l border-white/10 pt-4 lg:pt-0 lg:pl-4">
                     <h3 class="text-lg font-bold mb-4 sticky top-0 bg-yt-base/95 backdrop-blur z-10 py-2">Related Videos</h3>
                     <div class="overflow-y-auto scrollbar-styled flex-1 pb-20">
@@ -78,7 +78,7 @@ export const renderVideo = async (router, match) => {
 
         MainLayout(content, router, { padding: 'p-0' });
 
-        // 3. Setup Events
+        // 3. Thiết lập Sự kiện
         setupVideoEvents(router);
 
     } catch (error) {

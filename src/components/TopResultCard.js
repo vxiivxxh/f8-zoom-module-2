@@ -1,7 +1,7 @@
 import { Icons } from "./Icons";
 import { escapeHTML } from "../utils/security";
 
-// Generate a random-ish dark color based on string
+// Tạo màu tối ngẫu nhiên dựa trên chuỗi
 const getGradientColor = (str) => {
   const colors = [
     "#532638",
@@ -38,7 +38,7 @@ export const TopResultCard = (item) => {
     ? item.artists.map((a) => a.name).join(", ")
     : item.subtitle || item.artist || "";
 
-  // Serialize data for click handler
+  // Serialize dữ liệu cho trình xử lý click
   const jsonItem = JSON.stringify(item).replace(/'/g, "&#39;");
 
   return `
@@ -66,7 +66,7 @@ export const TopResultCard = (item) => {
                 </div>
              </div>
 
-             <!-- Play Button (Only for audio types) -->
+             <!-- Nút Phát (Chỉ dành cho các loại âm thanh) -->
              ${
                item.type === "song" ||
                item.type === "video" ||

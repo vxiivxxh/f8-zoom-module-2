@@ -14,9 +14,9 @@ export const renderNewReleases = async (router) => {
   );
 
   try {
-    // Fetch data for both sections
+    // Lấy dữ liệu cho cả hai phần
     const results = await Promise.all([
-      apiClient.getExploreAlbums(), // Reusing explore albums for "New Releases"
+      apiClient.getExploreAlbums(), // Sử dụng lại album khám phá cho "Bản phát hành mới"
       apiClient.getExploreVideos(),
     ]);
 
@@ -51,11 +51,11 @@ export const renderNewReleases = async (router) => {
 
     MainLayout(content, router);
 
-    // Event Delegation
+    // Ủy quyền sự kiện
     const main = document.querySelector("main");
     if (main) {
       main.addEventListener("click", (e) => {
-        // Priority: Play Button -> Play Song
+        // Ưu tiên: Nút Phát -> Phát Bài hát
         const playBtn = e.target.closest(".play-btn");
         const card = e.target.closest(".card-item");
 
@@ -65,21 +65,21 @@ export const renderNewReleases = async (router) => {
           const itemData = JSON.parse(card.dataset.item || "{}");
 
           if (type === "song") {
-            // Play action
+            // Hành động Phát
             import("../store/playerStore").then(({ playerStore }) => {
               playerStore.play(itemData);
             });
           } else if (type === "video") {
             router.navigate(`video/${id}`);
           } else {
-            // Navigate action for Containers (Album, Playlist, Artist)
+            // Hành động điều hướng cho Container (Album, Playlist, Artist)
             if (type === "album") router.navigate(`album/${id}`);
             else if (type === "playlist") router.navigate(`playlist/${id}`);
             else if (type === "artist") router.navigate(`artist/${id}`);
           }
         }
 
-        // Handle Scroll Buttons
+        // Xử lý nút cuộn
         const scrollBtn = e.target.closest("[data-scroll]");
         if (scrollBtn) {
           const direction = scrollBtn.dataset.scroll;
@@ -111,7 +111,7 @@ export const renderNewReleases = async (router) => {
   }
 };
 
-// --- Helper Functions (Duplicated from explore.js for now) ---
+// --- Hàm Helper (Tạm thời sao chép từ explore.js) ---
 
 const renderCarouselSection = ({
   title,

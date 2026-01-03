@@ -37,7 +37,7 @@ export const renderMoodsGenres = async (router) => {
 
     MainLayout(content, router);
 
-    // Event Delegation
+    // Ủy quyền sự kiện
     const main = document.querySelector("main");
     if (main) {
       main.addEventListener("click", (e) => {

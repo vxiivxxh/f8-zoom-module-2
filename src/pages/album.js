@@ -27,7 +27,7 @@ export const renderAlbum = async (router, params) => {
             album.thumbnail ||
             "https://via.placeholder.com/300";
 
-          // Fix: API confirmed to use 'tracks'
+          // Đã sửa: API xác nhận dùng 'tracks'
           const tracks = album.tracks || album.songs || [];
 
         const content = `

@@ -2,21 +2,21 @@ import { escapeHTML } from '../utils/security';
 import { Icons } from './Icons';
 
 /**
- * Shared Card Factory
- * @param {Object} item - The data item (song, album, playlist, video, artist)
- * @param {Object} options - Override properties { type, showType }
- * @returns {string} HTML string
+ * Factory Card được chia sẻ
+ * @param {Object} item - Mục dữ liệu (bài hát, album, danh sách phát, video, nghệ sĩ)
+ * @param {Object} options - Ghi đè thuộc tính { type, showType }
+ * @returns {string} Chuỗi HTML
  */
 export const Card = (item, options = {}) => {
-  // 1. Determine Type
+  // 1. Xác định loại
   const type = item.type || options.type || "song";
 
-  // 2. Determine ID and Slug
+  // 2. Xác định ID và Slug
   const id = item.encodeId || item.id || item._id;
   const slug = item.slug || "";
 
-  // 3. Title & Subtitle
-  const rawTitle = item.title || item.name || "Untitled";
+  // 3. Tiêu đề & Phụ đề
+  const rawTitle = item.title || item.name || "Không có tiêu đề";
   const title = escapeHTML(rawTitle);
 
   let rawSubtitle = "";
@@ -33,7 +33,7 @@ export const Card = (item, options = {}) => {
   }
   const subtitle = escapeHTML(rawSubtitle);
 
-  // 4. Image
+  // 4. Hình ảnh
   const image =
     (item.thumbnails && item.thumbnails[0]) ||
     item.thumbnail ||
@@ -41,24 +41,24 @@ export const Card = (item, options = {}) => {
     item.image ||
     "https://via.placeholder.com/300?text=No+Image";
 
-  // 5. Classes based on type
+  // 5. Các lớp dựa trên loại
   const isArtist = type === "artist";
   const isVideo = type === "video";
 
-  // Container width
+  // Chiều rộng container
   const widthClass = isVideo ? "w-80" : "w-48";
 
-  // Image Aspect Ratio
+  // Tỷ lệ khung hình ảnh
   const aspectClass = isVideo
     ? "aspect-video rounded-lg"
     : isArtist
     ? "aspect-square rounded-full"
     : "aspect-square rounded-md";
 
-  // Rank (for Charts)
+  // Xếp hạng (cho Bảng xếp hạng)
   const rank = item.rank || options.rank;
 
-  // Duration (for Videos)
+  // Thời lượng (cho Video)
   const formatDuration = (seconds) => {
     if (!seconds) return "";
     const h = Math.floor(seconds / 3600);
@@ -72,7 +72,7 @@ export const Card = (item, options = {}) => {
   };
   const duration = isVideo ? formatDuration(item.duration) : "";
 
-  // Views (for Videos)
+  // Lượt xem (cho Video)
   const formatViews = (num) => {
     if (!num) return "";
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -80,7 +80,7 @@ export const Card = (item, options = {}) => {
     return num.toString();
   };
 
-  // serialize for data attribute
+  // serialize cho thuộc tính dữ liệu
   const jsonItem = JSON.stringify(item).replace(/'/g, "&#39;");
 
   return `

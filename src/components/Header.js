@@ -6,7 +6,7 @@ import { escapeHTML } from "../utils/security";
 const SEARCH_HISTORY_KEY = "yt_search_history";
 const MAX_HISTORY_ITEMS = 5;
 
-// Get search history from localStorage
+// Lấy lịch sử tìm kiếm từ localStorage
 const getSearchHistory = () => {
   try {
     const history = localStorage.getItem(SEARCH_HISTORY_KEY);
@@ -16,30 +16,30 @@ const getSearchHistory = () => {
   }
 };
 
-// Save search term to history
+// Lưu từ khóa tìm kiếm vào lịch sử
 const saveToHistory = (term) => {
   if (!term || term.trim().length < 2) return;
 
   const history = getSearchHistory();
-  // Remove if already exists
+  // Xóa nếu đã tồn tại
   const filtered = history.filter(
     (h) => h.toLowerCase() !== term.toLowerCase()
   );
-  // Add to front
+  // Thêm vào đầu
   filtered.unshift(term);
-  // Keep only recent items
+  // Chỉ giữ lại các mục gần đây
   const limited = filtered.slice(0, MAX_HISTORY_ITEMS);
   localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(limited));
 };
 
-// Remove item from history
+// Xóa mục khỏi lịch sử
 const removeFromHistory = (term) => {
   const history = getSearchHistory();
   const filtered = history.filter((h) => h !== term);
   localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(filtered));
 };
 
-// Clear all history
+// Xóa tất cả lịch sử
 const clearAllHistory = () => {
   localStorage.removeItem(SEARCH_HISTORY_KEY);
 };
@@ -50,7 +50,7 @@ export const Header = () => {
 
   return `
     <header class="sticky top-0 h-16 bg-transparent z-header flex items-center justify-between px-[113px] mb-4">
-      <!-- Center: Search Bar -->
+      <!-- Giữa: Thanh tìm kiếm -->
       <div class="flex items-center flex-1 max-w-xl">
         <div class="relative w-full group" id="search-container">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -63,23 +63,23 @@ export const Header = () => {
                 class="block w-full p-2.5 pl-10 pr-10 text-sm text-yt-text-primary bg-white/10 border border-transparent rounded-lg focus:ring-white focus:border-white placeholder-gray-400 focus:bg-black"
                 autocomplete="off"
             >
-            <!-- Clear Button -->
+            <!-- Nút Xóa -->
             <button id="search-clear-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white transition-colors hidden">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <!-- Suggestions Dropdown -->
+            <!-- Dropdown Gợi ý -->
             <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-2 bg-yt-player rounded-lg shadow-xl border border-gray-700 hidden overflow-hidden z-50 max-h-[70vh] overflow-y-auto search-dropdown"></div>
         </div>
       </div>
 
-      <!-- Right Side Icons -->
+      <!-- Các biểu tượng bên phải -->
       <div class="flex items-center gap-4">
-          <!-- Cast Button -->
+          <!-- Nút Cast -->
           <button class="p-2 text-yt-text-primary hover:bg-white/10 rounded-full transition-colors" title="Cast to device">
              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.92-11-11-11z"/></svg>
           </button>
 
-          <!-- User Profile -->
+          <!-- Hồ sơ người dùng -->
          ${
            user
              ? `
@@ -108,7 +108,7 @@ export const Header = () => {
   `;
 };
 
-// Render search history section
+// Render phần lịch sử tìm kiếm
 const renderHistorySection = (history) => {
   if (history.length === 0) return "";
 
@@ -141,7 +141,7 @@ const renderHistorySection = (history) => {
   `;
 };
 
-// Render text suggestions section
+// Render phần gợi ý văn bản
 const renderSuggestionsSection = (suggestions) => {
   if (!suggestions || suggestions.length === 0) return "";
 
@@ -167,7 +167,7 @@ const renderSuggestionsSection = (suggestions) => {
   `;
 };
 
-// Render completed items (albums, videos, songs with thumbnails)
+// Render các mục đã hoàn thành (album, video, bài hát có hình thu nhỏ)
 const renderCompletedSection = (items) => {
   if (!items || items.length === 0) return "";
 
@@ -179,7 +179,7 @@ const renderCompletedSection = (items) => {
             (item.thumbnails && item.thumbnails[0]) ||
             item.thumbnail ||
             "https://via.placeholder.com/60";
-          const title = escapeHTML(item.title || item.name || "Untitled");
+          const title = escapeHTML(item.title || item.name || "Không có tiêu đề");
           const subtitle = escapeHTML(item.subtitle || item.type || "");
           const typeLabel =
             item.type === "album"
@@ -220,7 +220,7 @@ const renderCompletedSection = (items) => {
 
 // Gắn sự kiện sau khi render
 export const setupHeaderEvents = (router) => {
-  // Toggle Sidebar
+  // Bật/tắt Sidebar
   const toggleBtn = document.getElementById("sidebar-toggle");
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
@@ -228,7 +228,7 @@ export const setupHeaderEvents = (router) => {
     });
   }
 
-  // Search Logic
+  // Logic tìm kiếm
   const searchInput = document.getElementById("search-input");
   const suggestionsBox = document.getElementById("search-suggestions");
   const clearBtn = document.getElementById("search-clear-btn");
@@ -236,7 +236,7 @@ export const setupHeaderEvents = (router) => {
   let currentQuery = "";
 
   if (searchInput && suggestionsBox) {
-    // Show/hide clear button
+    // Hiển thị/ẩn nút xóa
     const updateClearButton = () => {
       if (clearBtn) {
         if (searchInput.value.trim().length > 0) {
@@ -247,7 +247,7 @@ export const setupHeaderEvents = (router) => {
       }
     };
 
-    // Clear button click
+    // Sự kiện click nút xóa
     if (clearBtn) {
       clearBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -258,7 +258,7 @@ export const setupHeaderEvents = (router) => {
       });
     }
 
-    // Show initial suggestions (history only)
+    // Hiển thị gợi ý ban đầu (chỉ lịch sử)
     const showInitialSuggestions = () => {
       const history = getSearchHistory();
       if (history.length > 0) {
@@ -269,7 +269,7 @@ export const setupHeaderEvents = (router) => {
       }
     };
 
-    // Handle Input
+    // Xử lý đầu vào
     searchInput.addEventListener("input", (e) => {
       const query = e.target.value.trim();
       currentQuery = query;
@@ -286,7 +286,7 @@ export const setupHeaderEvents = (router) => {
           const res = await apiClient.getSearchSuggestions(query);
           const data = res || {};
 
-          // API returns { suggestions: [...], completed: [...] }
+          // API trả về { suggestions: [...], completed: [...] }
           const suggestions = data.suggestions || [];
           const completed = data.completed || [];
           const history = getSearchHistory().filter((h) =>
@@ -295,17 +295,17 @@ export const setupHeaderEvents = (router) => {
 
           let html = "";
 
-          // History matches
+          // Kết quả trùng khớp trong lịch sử
           if (history.length > 0) {
             html += renderHistorySection(history);
           }
 
-          // Text suggestions
+          // Gợi ý văn bản
           if (suggestions.length > 0) {
             html += renderSuggestionsSection(suggestions);
           }
 
-          // Completed items (albums, videos, songs)
+          // Các mục đã hoàn thành (album, video, bài hát)
           if (completed.length > 0) {
             html += renderCompletedSection(completed);
           }
@@ -322,7 +322,7 @@ export const setupHeaderEvents = (router) => {
       }, 300);
     });
 
-    // Handle Focus
+    // Xử lý Focus
     searchInput.addEventListener("focus", () => {
       updateClearButton();
       const query = searchInput.value.trim();
@@ -333,7 +333,7 @@ export const setupHeaderEvents = (router) => {
       }
     });
 
-    // Handle Enter Key
+    // Xử lý phím Enter
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         const term = searchInput.value.trim();
@@ -352,20 +352,20 @@ export const setupHeaderEvents = (router) => {
       }
     });
 
-    // Handle suggestion clicks
+    // Xử lý click vào gợi ý
     suggestionsBox.addEventListener("click", (e) => {
-      // Delete history button
+      // Nút xóa lịch sử
       const deleteBtn = e.target.closest(".delete-history-btn");
       if (deleteBtn) {
         e.stopPropagation();
         const term = deleteBtn.dataset.term;
         removeFromHistory(term);
-        // Refresh suggestions
+        // Làm mới gợi ý
         const parentItem = deleteBtn.closest(".history-item");
         if (parentItem) {
           parentItem.remove();
         }
-        // If no more history items, hide or refresh
+        // Nếu không còn mục lịch sử nào, ẩn hoặc làm mới
         const remainingHistory =
           suggestionsBox.querySelectorAll(".history-item");
         if (remainingHistory.length === 0) {
@@ -377,7 +377,7 @@ export const setupHeaderEvents = (router) => {
         return;
       }
 
-      // Completed item click (navigate directly)
+      // Click vào mục đã hoàn thành (điều hướng trực tiếp)
       const completedItem = e.target.closest(".search-completed-item");
       if (completedItem) {
         const type = completedItem.dataset.type;
@@ -400,7 +400,7 @@ export const setupHeaderEvents = (router) => {
         return;
       }
 
-      // Text suggestion click
+      // Click vào gợi ý văn bản
       const suggestionItem = e.target.closest("[data-suggestion]");
       if (suggestionItem) {
         const term = suggestionItem.dataset.suggestion;
@@ -414,7 +414,7 @@ export const setupHeaderEvents = (router) => {
       }
     });
 
-    // Close when clicking outside
+    // Đóng khi click ra ngoài
     const closeSearch = (e) => {
       const searchContainer = document.getElementById("search-container");
       if (searchContainer && !searchContainer.contains(e.target)) {
@@ -424,7 +424,7 @@ export const setupHeaderEvents = (router) => {
     document.addEventListener("click", closeSearch);
   }
 
-  // Logout Logic
+  // Logic đăng xuất
   const logoutBtn = document.getElementById("header-logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
@@ -437,7 +437,7 @@ export const setupHeaderEvents = (router) => {
     });
   }
 
-  // Toggle Profile Dropdown
+  // Bật/tắt Dropdown hồ sơ
   const trigger = document.getElementById("profile-trigger");
   const dropdown = document.getElementById("profile-dropdown");
 

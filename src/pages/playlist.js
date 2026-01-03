@@ -18,7 +18,7 @@ export const renderPlaylist = async (router, params) => {
 
     try {
       const res = await apiClient.getPlaylistDetails(slug);
-      const playlist = res.data || res; // Handle structure variation
+      const playlist = res.data || res; // Xử lý biến thể cấu trúc
 
       const title = escapeHTML(playlist.title || playlist.name || "Playlist");
       const description = escapeHTML(
@@ -29,7 +29,7 @@ export const renderPlaylist = async (router, params) => {
         playlist.thumbnail ||
         "https://via.placeholder.com/300";
 
-      // Fix: API returns structure { song: { items: [...] } } or just { songs: [...] } or { items: [...] }
+      // Sửa lỗi: API trả về cấu trúc { song: { items: [...] } } hoặc chỉ { songs: [...] } hoặc { items: [...] }
       let tracks = [];
       if (playlist.song && Array.isArray(playlist.song.items)) {
         tracks = playlist.song.items;
@@ -41,7 +41,7 @@ export const renderPlaylist = async (router, params) => {
 
       const content = `
             <div class="flex flex-col md:flex-row gap-8">
-                <!-- Header / Cover -->
+                <!-- Tiêu đề / Bìa -->
                 <div class="flex-shrink-0 w-full md:w-80 flex flex-col items-center md:items-start text-center md:text-left">
                      <div class="w-64 h-64 md:w-full md:h-auto aspect-square rounded-lg overflow-hidden shadow-2xl mb-6">
                         <img src="${image}" alt="${title}" class="w-full h-full object-cover">
@@ -62,7 +62,7 @@ export const renderPlaylist = async (router, params) => {
                      </div>
                 </div>
 
-                <!-- Track List -->
+                <!-- Danh sách bài hát -->
                 <div class="flex-1">
                     ${renderTrackList(tracks)}
                 </div>
@@ -71,7 +71,7 @@ export const renderPlaylist = async (router, params) => {
 
       MainLayout(content, router);
 
-      // Add Listeners
+      // Thêm sự kiện lắng nghe
       const main = document.querySelector("main");
       if (main) {
         main.addEventListener("click", (e) => {

@@ -117,14 +117,14 @@ body.sidebar-collapsed .hide-on-collapse {
     display: none !important;
 }
 
-/* Keep logo visible and clickable when sidebar is collapsed */
+/* Giữ logo hiển thị và có thể click khi sidebar bị thu gọn */
 body.sidebar-collapsed .logo-container {
     display: flex !important;
     pointer-events: auto !important;
     position: relative !important;
     z-index: 50 !important;
 }
-/* Search Dropdown Styles */
+/* Kiểu cho Dropdown Tìm kiếm */
 .search-dropdown {
     background-color: #212121;
     backdrop-filter: blur(10px);
@@ -139,7 +139,7 @@ body.sidebar-collapsed .logo-container {
     transition: background-color 0.2s;
 }
 
-/* Category Filter Pill */
+/* Pill Lọc Thể loại */
 .category-pill {
     @apply px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-white/10 whitespace-nowrap;
 }
@@ -152,7 +152,7 @@ body.sidebar-collapsed .logo-container {
     @apply bg-white/5 text-yt-text-primary hover:bg-white/10;
 }
 
-/* Song Row Hover Effects */
+/* Hiệu ứng Hover cho Hàng bài hát */
 .song-row:hover .song-row-play {
     opacity: 1;
 }

@@ -60,8 +60,8 @@ router.on({
     renderLineDetail(router, match);
   },
   "/artist/:id": (match) => {
-    // TODO: Implement artist detail
-    console.log("Artist detail not implemented", match);
+    // TODO: Triển khai chi tiết nghệ sĩ
+    console.log("Chi tiết nghệ sĩ chưa được triển khai", match);
   },
   "/login": () => {
     if (authStore.isAuthenticated) {
@@ -79,9 +79,9 @@ router.on({
   },
 });
 
-// Custom event to force re-render on search (when router doesn't detect change due to same path)
+// Sự kiện tùy chỉnh để buộc render lại khi tìm kiếm (khi router không phát hiện thay đổi do cùng đường dẫn)
 window.addEventListener("search-change", (e) => {
-    // Only if we are on search page
+    // Chỉ khi chúng ta đang ở trang tìm kiếm
     const isSearch = window.location.hash.includes("/search") || window.location.pathname.includes("/search");
     if (isSearch) {
         renderSearch(router, e.detail?.query);

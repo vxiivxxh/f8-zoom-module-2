@@ -4,10 +4,10 @@ import { escapeHTML } from '../utils/security';
 
 export const renderMedia = async (router, params) => {
     const id = params?.id;
-    // Determine type by checking URL or just generic handling. 
-    // We can guess it's a song or video. 
-    // For now, let's try calling song API, if it fails, try video, or simpler reuse for both routes.
-    // However, `renderMedia` is called by router. We can check current route.
+    // Xác định loại bằng cách kiểm tra URL hoặc xử lý chung.
+    // Chúng ta có thể đoán đó là bài hát hoặc video.
+    // Hiện tại, hãy thử gọi API bài hát, nếu thất bại, hãy thử video hoặc sử dụng lại đơn giản hơn cho cả hai tuyến.
+    // Tuy nhiên, `renderMedia` được gọi bởi router. Chúng ta có thể kiểm tra tuyến đường hiện tại.
     const isVideo = window.location.pathname.startsWith('/video');
     
     if (!id) {
@@ -59,14 +59,14 @@ export const renderMedia = async (router, params) => {
                         </p>
                      </div>
                      
-                     <!-- Recommendations could go here -->
+                     <!-- Các đề xuất có thể đi ở đây -->
                 </div>
             </div>
         `;
 
         MainLayout(content, router);
         
-        // Listeners
+        // Người nghe (Listeners)
         const playBtn = document.querySelector('.play-btn');
         if (playBtn) {
             playBtn.addEventListener('click', () => {

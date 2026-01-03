@@ -58,11 +58,11 @@ export const renderExplore = async (router) => {
 
     MainLayout(content, router);
 
-    // 1. Event Delegation for Cards
+    // 1. Ủy quyền sự kiện cho Thẻ (Cards)
     const main = document.querySelector("main");
     if (main) {
       main.addEventListener("click", (e) => {
-        // Priority: Play Button -> Play Song
+        // Ưu tiên: Nút Phát -> Phát Bài hát
         const playBtn = e.target.closest(".play-btn");
         const card = e.target.closest(".card-item");
 
@@ -71,7 +71,7 @@ export const renderExplore = async (router) => {
           const id = card.dataset.id;
           const itemData = JSON.parse(card.dataset.item || "{}");
 
-          // Only Play if explicitly a Song or Video (with play button)
+          // Chỉ phát nếu rõ ràng là Bài hát hoặc Video (có nút phát)
           if (type === "song") {
             import("../store/playerStore").then(({ playerStore }) => {
               playerStore.play(itemData);
@@ -79,7 +79,7 @@ export const renderExplore = async (router) => {
           } else if (type === "video") {
             router.navigate(`video/${id}`);
           } else {
-            // Navigate action for Containers (Album, Playlist, Artist)
+            // Hành động điều hướng cho Container (Album, Playlist, Artist)
             if (type === "album") router.navigate(`album/${id}`);
             else if (type === "playlist") router.navigate(`playlist/${id}`);
             else if (type === "artist") router.navigate(`artist/${id}`);
@@ -89,7 +89,7 @@ export const renderExplore = async (router) => {
           }
         }
 
-        // Handle Scroll Buttons
+        // Xử lý các nút cuộn
         const scrollBtn = e.target.closest("[data-scroll]");
         if (scrollBtn) {
           const direction = scrollBtn.dataset.scroll;
@@ -105,11 +105,11 @@ export const renderExplore = async (router) => {
           }
         }
 
-        // Handle Mood Card Clicks (from MoodGrid)
+        // Xử lý Click vào Thẻ Tâm trạng (từ MoodGrid)
         const moodCard = e.target.closest(".mood-card");
         if (moodCard) {
           e.preventDefault();
-          const type = moodCard.dataset.type; // 'category' or 'line' usually
+          const type = moodCard.dataset.type; // thường là 'category' hoặc 'line'
           const slug = moodCard.dataset.slug;
 
           if (type === "category") {
@@ -117,7 +117,7 @@ export const renderExplore = async (router) => {
           } else if (type === "line") {
             router.navigate(`line/${slug}`);
           } else if (type === "mood") {
-            // Fallback if type is mood (e.g. from homepage if it used this component, but it doesn't anymore)
+            // Dự phòng nếu type là mood (VD: từ trang chủ nếu nó dùng component này, nhưng giờ không dùng nữa)
             router.navigate(`mood/${slug}`);
           }
         }
@@ -137,9 +137,9 @@ export const renderExplore = async (router) => {
   }
 };
 
-// --- Helper Functions ---
+// --- Hàm Helper ---
 
-// Render sections that appear at the top of the page
+// Render các phần xuất hiện ở đầu trang
 const renderTopNavigation = () => {
   return `
          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
